@@ -45,42 +45,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="115dp"
                     android:background="@drawable/blotter_new_ripple" />
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="115dp"
-                    android:background="@drawable/blotter_new_ripple" />
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="115dp"
-                    android:background="@drawable/blotter_new_ripple" />
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="115dp"
-                    android:background="@drawable/blotter_new_ripple" />
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="115dp"
-                    android:background="@drawable/blotter_new_ripple" />
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="115dp"
-                    android:background="@drawable/blotter_new_ripple" />
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="115dp"
-                    android:background="@drawable/blotter_new_ripple" />
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="115dp"
-                    android:background="@drawable/blotter_new_ripple" />
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="115dp"
-                    android:background="@drawable/blotter_new_ripple" />
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="115dp"
-                    android:background="@drawable/blotter_new_ripple" />
+
 
 
             </LinearLayout>
@@ -92,6 +57,15 @@
     <include layout="@layout/bottom_button" ></include>
 
 
+    <ImageView
+        android:id="@+id/float_button"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="60dp"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/float_button"
+        android:layout_gravity="bottom|right"
+        android:background="?android:attr/selectableItemBackground"/>
 
 
 </FrameLayout>

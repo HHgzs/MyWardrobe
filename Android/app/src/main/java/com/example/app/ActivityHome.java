@@ -12,6 +12,7 @@ public class ActivityHome extends AppCompatActivity implements View.OnClickListe
     private ImageView wardrobe_button;
     private ImageView home_button;
     private ImageView blotter_button;
+    private ImageView float_button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,10 +22,12 @@ public class ActivityHome extends AppCompatActivity implements View.OnClickListe
         home_button = findViewById(R.id.home_button);
         wardrobe_button = findViewById(R.id.wardrobe_button);
         blotter_button = findViewById(R.id.blotter_button);
+        float_button = findViewById(R.id.float_button);
 
         home_button.setOnClickListener(this);
         wardrobe_button.setOnClickListener(this);
         blotter_button.setOnClickListener(this);
+        float_button.setOnClickListener(this);
         changePageType();
 
 
@@ -43,6 +46,10 @@ public class ActivityHome extends AppCompatActivity implements View.OnClickListe
                 Intent bl_intent = new Intent(this,ActivityBlotter.class);
                 bl_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(bl_intent);
+                break;
+            case R.id.float_button:
+                Intent items_intent = new Intent(this,ActivityAddItems.class);
+                startActivity(items_intent);
                 break;
 
         }
