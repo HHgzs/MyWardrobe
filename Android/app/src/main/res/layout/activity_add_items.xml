@@ -49,6 +49,7 @@
         android:layout_height="40dp"
         android:hint="请输入名称"
         android:inputType="text"
+        android:singleLine="true"
         />
 
     <LinearLayout
@@ -132,7 +133,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="match_parent"
@@ -227,6 +228,19 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:text="确定"/>
+    <Button
+        android:id="@+id/btn_exit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="取消"/>
+    <Button
+        android:id="@+id/btn_delete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="删库跑路"/>
+
 
 
 </LinearLayout>
