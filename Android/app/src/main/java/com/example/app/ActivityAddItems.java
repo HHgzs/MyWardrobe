@@ -3,11 +3,15 @@ package com.example.app;
 import static com.example.app.R.id.et_name;
 import static com.example.app.util.ToastUtil.show;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -26,6 +30,9 @@ import com.example.app.database.ItemsDBHelper;
 import com.example.app.entity.clothesInfo;
 import com.example.app.entity.itemsInfo;
 import com.example.app.util.ToastUtil;
+
+import java.io.File;
+import java.util.Calendar;
 
 
 public class ActivityAddItems extends AppCompatActivity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
@@ -59,9 +66,13 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     private final static String[] thicknessArray = {"薄","中","厚"};
     private final static String[] seasonArray = {"春秋","夏","冬"};
 
+    private String directory;
+    private ActivityResultLauncher<Intent> register;
+
     private clothesInfo mClothesInfo;
     private itemsInfo mItemsInfo;
     private ItemsDBHelper mDBHelper;
+
 
 
     @SuppressLint("MissingInflatedId")
@@ -103,6 +114,8 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         // 创建数据对象
         mClothesInfo = new clothesInfo();
         mItemsInfo = new itemsInfo();
+
+        directory = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + File.separatorChar;
 
         mDBHelper = ItemsDBHelper.getInstance(this);
         mDBHelper.openReadLink();
@@ -163,10 +176,46 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
 
             case R.id.pop_btn_catch:
                 mPopWindow.dismiss();
+
+                String path = directory + getTime() +".jpg";
+                register = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                    if (result != null) {
+                        Intent intent = result.getData();
+                        if (intent != null && result.getResultCode() == Activity.RESULT_OK) {
+
+
+
+
+
+
+
+
+                        }
+                    }
+
+
+
+
+
+
+                });
+
+
+
+//                Intent takeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                takeIntent.putExtra(MediaStore.EXTRA_OUTPUT,);
+
+
+
+
+
+
                 break;
 
             case R.id.pop_btn_album:
-                Intent intent_album = new Intent(Intent.ACTION_PICK);
+//                Intent intent_album = new Intent(Intent.ACTION_PICK);
+
+                show(this,getTime());
 
                 mPopWindow.dismiss();
                 break;
@@ -266,4 +315,41 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         super.onDestroy();
         mDBHelper.closeLink();
     }
+
+    private String getTime() {
+        String str;
+        Calendar selectedDate = Calendar.getInstance();
+
+        int year = selectedDate.get(Calendar.YEAR);
+        int month = selectedDate.get(Calendar.MONTH) + 1;
+        int day = selectedDate.get(Calendar.DAY_OF_MONTH);
+        int hour = selectedDate.get(Calendar.HOUR);
+        int minute = selectedDate.get(Calendar.MINUTE);
+        int second = selectedDate.get(Calendar.SECOND);
+
+        str = String.valueOf(year);
+        if(month < 10) { str += "0"; }
+        str += String.valueOf(month);
+        if(day < 10) { str += "0"; }
+        str += String.valueOf(day);
+        str += "_";
+        if(hour < 10) { str += "0"; }
+        str += String.valueOf(hour);
+        if(minute < 10) { str += "0"; }
+        str += String.valueOf(minute);
+        if(second < 10) { str += "0"; }
+        str += String.valueOf(second);
+        return str;
+    }
+
+
+
+
+
+
+
+
+
+
+
 }
