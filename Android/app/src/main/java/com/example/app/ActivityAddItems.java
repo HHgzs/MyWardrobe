@@ -31,13 +31,11 @@ import com.example.app.entity.clothesInfo;
 import com.example.app.entity.itemsInfo;
 import com.example.app.util.ToastUtil;
 
-import org.devio.takephoto.app.TakePhotoActivity;
-
 import java.io.File;
 import java.util.Calendar;
 
 
-public class ActivityAddItems extends TakePhotoActivity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
+public class ActivityAddItems extends AppCompatActivity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
 
     private RadioGroup rg_clothes_or_items;
     private RadioGroup rg_clothes;
@@ -76,8 +74,6 @@ public class ActivityAddItems extends TakePhotoActivity implements View.OnClickL
     private ItemsDBHelper mDBHelper;
 
 
-
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -180,18 +176,28 @@ public class ActivityAddItems extends TakePhotoActivity implements View.OnClickL
                 mPopWindow.dismiss();
 
                 String path = directory + getTime() +".jpg";
-//                register = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-//                    if (result != null) {
-//                        Intent intent = result.getData();
-//                        if (intent != null && result.getResultCode() == Activity.RESULT_OK) {
-//
-//
-//                        }
-//                    }
-//
-//                });
+                register = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                    if (result != null) {
+                        Intent intent = result.getData();
+                        if (intent != null && result.getResultCode() == Activity.RESULT_OK) {
 
-                
+
+
+
+
+
+
+
+                        }
+                    }
+
+
+
+
+
+
+                });
+
 
 
 //                Intent takeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
