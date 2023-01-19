@@ -1,18 +1,26 @@
 package com.example.app;
 
-import static com.example.app.R.id.et_name;
+import static android.os.Environment.DIRECTORY_PICTURES;
+import static android.os.Environment.getExternalStoragePublicDirectory;
+import static androidx.core.content.PackageManagerCompat.LOG_TAG;
 import static com.example.app.util.ToastUtil.show;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.SyncStateContract;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +28,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RadioGroup;
@@ -29,9 +38,13 @@ import android.widget.TextView;
 import com.example.app.database.ItemsDBHelper;
 import com.example.app.entity.clothesInfo;
 import com.example.app.entity.itemsInfo;
-import com.example.app.util.ToastUtil;
+import com.example.app.util.FileUtil;
+import com.google.android.material.snackbar.Snackbar;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Calendar;
 
 
@@ -52,6 +65,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     private EditText et_name;
     private EditText et_brief;
     private EditText et_items_brief;
+    private ImageView iv_img_show;
 
     // 物品首选分类分成衣橱内物品和其他物品，衣橱内用 0 表示，其他用 1 表示
     // clothing代表衣物，bedding代表床单被褥，clothes是上述两者总称呼
@@ -67,7 +81,10 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     private final static String[] seasonArray = {"春秋","夏","冬"};
 
     private String directory;
+    private String rootDir;
+    private String path = null;
     private ActivityResultLauncher<Intent> register;
+
 
     private clothesInfo mClothesInfo;
     private itemsInfo mItemsInfo;
@@ -85,10 +102,10 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         rg_clothes = findViewById(R.id.rg_type);
         rg_clothes.setOnCheckedChangeListener(this);
 
-        layout_clothes = (LinearLayout)findViewById(R.id.layout_clothes);
-        layout_items = (LinearLayout)findViewById(R.id.layout_items);
-        ll_clothingType = (LinearLayout)findViewById(R.id.ll_clothingType);
-        ll_beddingType = (LinearLayout)findViewById(R.id.ll_beddingType);
+        layout_clothes = (LinearLayout) findViewById(R.id.layout_clothes);
+        layout_items = (LinearLayout) findViewById(R.id.layout_items);
+        ll_clothingType = (LinearLayout) findViewById(R.id.ll_clothingType);
+        ll_beddingType = (LinearLayout) findViewById(R.id.ll_beddingType);
 
         sp_clothing_type = findViewById(R.id.sp_clothing_type);
         sp_bedding_type = findViewById(R.id.sp_bedding_type);
@@ -99,10 +116,10 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         et_name = findViewById(R.id.et_name);
         et_brief = findViewById(R.id.et_brief);
         et_items_brief = findViewById(R.id.et_items_brief);
-
+        iv_img_show = findViewById(R.id.iv_img_show);
 
         // 为图片添加按钮设置点击事件监听，弹出拍照或从相册选择按钮
-        Button btn_add_img = (Button)findViewById(R.id.btn_add_img);
+        Button btn_add_img = (Button) findViewById(R.id.btn_add_img);
         btn_add_img.setOnClickListener(v -> showPopupWindow());
 
         findViewById(R.id.btn_save).setOnClickListener(this);
@@ -112,18 +129,56 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         // 创建数据对象
         mClothesInfo = new clothesInfo();
         mItemsInfo = new itemsInfo();
-
-        directory = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + File.separatorChar;
+        directory = getCachePath(this) + File.separatorChar;
+        rootDir = "/storage/Picture";
 
         mDBHelper = ItemsDBHelper.getInstance(this);
         mDBHelper.openReadLink();
         mDBHelper.openWriteLink();
         // 初始化下拉列表
         initSpinner();
-
-
     }
 
+
+
+
+
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 2) {
+            if (data != null) {
+
+//                File textDir = new File("/storage/Pictures/MyWardrobe");
+//                if (!textDir.exists()) {
+//                    textDir.mkdir();
+//                }
+//                File file = getAppSpecificAlbumStorageDir(this,"MyWardrobe");
+//                path = new File(file,getTime() + ".jpg").toString();
+
+                String file = getExternalStoragePublicDirectory(DIRECTORY_PICTURES).toString() + File.separatorChar;
+                path = file + getTime() + ".jpg";
+                Log.d("HH",path);
+
+                Uri uri = data.getData();
+                Bitmap bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                FileUtil.saveImage(path, bitmap);
+                bitmap.recycle();
+
+                Bitmap bitmap2 = FileUtil.openImage(path);
+                Uri uri2 = Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(), bitmap2, null,null));
+                iv_img_show.setImageURI(uri2);
+            }
+        }
+    }
 
     @Override
     public void onClick(View v) {
@@ -145,6 +200,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
                     mClothesInfo.thickness = sp_clothes_thickness.getSelectedItemPosition();
                     mClothesInfo.season = sp_clothes_season.getSelectedItemPosition();
                     mClothesInfo.brief = et_brief.getText().toString();
+                    mClothesInfo.imgPath = path;
 
                     // 向clothes数据库插入项
                     mDBHelper.insertClothesInfo(mClothesInfo);
@@ -153,13 +209,14 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
                     mItemsInfo.name = et_name.getText().toString();
                     mItemsInfo.type = sp_items_type.getSelectedItemPosition();
                     mItemsInfo.brief = et_items_brief.getText().toString();
+                    mItemsInfo.imgPath = path;
 
                     // 向clothes数据库插入项
                     mDBHelper.insertItemsInfo(mItemsInfo);
 
                 }
 
-//                finish();
+                finish();
                 break;
 
             case R.id.btn_exit:
@@ -173,48 +230,17 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
 
 
             case R.id.pop_btn_catch:
+                Intent intent = new Intent();
+                intent.setAction("android.media.action.STILL_IMAGE_CAMERA");
+                startActivity(intent);
                 mPopWindow.dismiss();
-
-                String path = directory + getTime() +".jpg";
-                register = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                    if (result != null) {
-                        Intent intent = result.getData();
-                        if (intent != null && result.getResultCode() == Activity.RESULT_OK) {
-
-
-
-
-
-
-
-
-                        }
-                    }
-
-
-
-
-
-
-                });
-
-
-
-//                Intent takeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                takeIntent.putExtra(MediaStore.EXTRA_OUTPUT,);
-
-
-
-
-
-
                 break;
 
             case R.id.pop_btn_album:
-//                Intent intent_album = new Intent(Intent.ACTION_PICK);
 
-                show(this,getTime());
-
+                Intent intent2 = new Intent(Intent.ACTION_PICK, null);
+                intent2.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+                startActivityForResult(intent2, 2);
                 mPopWindow.dismiss();
                 break;
 
@@ -250,6 +276,8 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
 
         }
     }
+
+
 
     private void showPopupWindow() {
         View contentView = LayoutInflater.from(this).inflate(R.layout.popupwindow_add_img,null);
@@ -330,7 +358,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         str += String.valueOf(month);
         if(day < 10) { str += "0"; }
         str += String.valueOf(day);
-        str += "_";
+//        str += "_";
         if(hour < 10) { str += "0"; }
         str += String.valueOf(hour);
         if(minute < 10) { str += "0"; }
@@ -341,6 +369,31 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     }
 
 
+    public String getCachePath(Context context) {
+        String cachePath;
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || !Environment.isExternalStorageRemovable()) {
+        // 外部存储可用
+            cachePath = context.getExternalCacheDir().getPath() ;
+        } else {
+//外部存储不可用
+            cachePath = context.getCacheDir().getPath() ;
+        }
+        return cachePath ;
+    }
+
+
+    @Nullable
+    File getAppSpecificAlbumStorageDir(Context context, String albumName) {
+        // Get the pictures directory that's inside the app-specific directory on
+        // external storage.
+        File file = new File(context.getExternalFilesDir(
+                Environment.DIRECTORY_PICTURES), albumName);
+        if (file == null || !file.mkdirs()) {
+            Log.e("HH", "Directory not created");
+        }
+
+        return file;
+    }
 
 
 
