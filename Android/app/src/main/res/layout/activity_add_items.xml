@@ -66,9 +66,17 @@
 
         <ImageView
             android:id="@+id/iv_img_show"
+            android:layout_weight="1"
             android:layout_width="80dp"
             android:layout_height="match_parent"/>
 
+        <Button
+            android:id="@+id/btn_crop_img"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:textAllCaps="false"
+            android:layout_gravity="right"
+            android:text="crop"/>
 
     </LinearLayout>
 

@@ -11,15 +11,19 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.SyncStateContract;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -38,6 +42,7 @@ import android.widget.TextView;
 import com.example.app.database.ItemsDBHelper;
 import com.example.app.entity.clothesInfo;
 import com.example.app.entity.itemsInfo;
+import com.example.app.util.DataService;
 import com.example.app.util.FileUtil;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -45,7 +50,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.Calendar;
+import java.util.Date;
+
+import kotlin.jvm.internal.PropertyReference0Impl;
 
 
 public class ActivityAddItems extends AppCompatActivity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
@@ -80,15 +90,20 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     private final static String[] thicknessArray = {"薄","中","厚"};
     private final static String[] seasonArray = {"春秋","夏","冬"};
 
+    private final int ALBUM_REQUEST_CODE = 1;
+    private final int CROP_REQUEST_CODE = 2;
+
     private String directory;
     private String rootDir;
-    private String path = null;
-    private ActivityResultLauncher<Intent> register;
+    private static String path = null;
+    private static Uri mUri;
+    private ActivityResultLauncher<Intent> registerCrop;
 
 
     private clothesInfo mClothesInfo;
     private itemsInfo mItemsInfo;
     private ItemsDBHelper mDBHelper;
+    private Bitmap bitmap = null;
 
 
     @Override
@@ -125,6 +140,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         findViewById(R.id.btn_save).setOnClickListener(this);
         findViewById(R.id.btn_exit).setOnClickListener(this);
         findViewById(R.id.btn_delete).setOnClickListener(this);
+        findViewById(R.id.btn_crop_img).setOnClickListener(this);
 
         // 创建数据对象
         mClothesInfo = new clothesInfo();
@@ -149,34 +165,37 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 2) {
+        // 接收打开相册选择的照片，
+        if (requestCode == ALBUM_REQUEST_CODE) {
             if (data != null) {
 
-//                File textDir = new File("/storage/Pictures/MyWardrobe");
-//                if (!textDir.exists()) {
-//                    textDir.mkdir();
-//                }
-//                File file = getAppSpecificAlbumStorageDir(this,"MyWardrobe");
-//                path = new File(file,getTime() + ".jpg").toString();
-
-                String file = getExternalStoragePublicDirectory(DIRECTORY_PICTURES).toString() + File.separatorChar;
-                path = file + getTime() + ".jpg";
-                Log.d("HH",path);
-
                 Uri uri = data.getData();
-                Bitmap bitmap = null;
                 try {
                     bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                FileUtil.saveImage(path, bitmap);
-                bitmap.recycle();
 
-                Bitmap bitmap2 = FileUtil.openImage(path);
-                Uri uri2 = Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(), bitmap2, null,null));
-                iv_img_show.setImageURI(uri2);
+                saveImageToGallery(this, bitmap);
+
+                //  Uri uri2 = Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(), bitmap2, null,null));
+                //  显示已选照片 path源自原图
+                //  Uri uri2 = Uri.parse((String) path);
+                //  iv_img_show.setImageURI(uri2);
+
+                iv_img_show.setImageBitmap(bitmap);
+
             }
+        }
+
+        // 接收裁剪后的数据，存入全局变量 bitmap
+        if (requestCode == CROP_REQUEST_CODE) {
+            DataService instance = DataService.getInstance();
+            if (instance.getEditBitmap()!=null){
+                bitmap = instance.getEditBitmap();
+                iv_img_show.setImageBitmap(bitmap);
+            }
+
         }
     }
 
@@ -227,20 +246,26 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
                 mDBHelper.dataInit();
                 break;
 
+            case R.id.btn_crop_img:
+                DataService instance = DataService.getInstance();
+                instance.setEditBitmap(bitmap);
+                Intent intent_crop = new Intent(this,ActivityCropper.class);
+                startActivityForResult(intent_crop,CROP_REQUEST_CODE);
+                break;
 
 
             case R.id.pop_btn_catch:
-                Intent intent = new Intent();
-                intent.setAction("android.media.action.STILL_IMAGE_CAMERA");
-                startActivity(intent);
+                Intent intent_catch = new Intent();
+                intent_catch.setAction("android.media.action.STILL_IMAGE_CAMERA");
+                startActivity(intent_catch);
                 mPopWindow.dismiss();
                 break;
 
             case R.id.pop_btn_album:
 
-                Intent intent2 = new Intent(Intent.ACTION_PICK, null);
-                intent2.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-                startActivityForResult(intent2, 2);
+                Intent intent_album = new Intent(Intent.ACTION_PICK, null);
+                intent_album.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+                startActivityForResult(intent_album, ALBUM_REQUEST_CODE);
                 mPopWindow.dismiss();
                 break;
 
@@ -278,7 +303,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     }
 
 
-
+    // 显示下方弹出列表
     private void showPopupWindow() {
         View contentView = LayoutInflater.from(this).inflate(R.layout.popupwindow_add_img,null);
         mPopWindow = new PopupWindow(contentView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT,true);
@@ -342,7 +367,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         mDBHelper.closeLink();
     }
 
-    private String getTime() {
+    private static String getTime() {
         String str;
         Calendar selectedDate = Calendar.getInstance();
 
@@ -358,7 +383,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         str += String.valueOf(month);
         if(day < 10) { str += "0"; }
         str += String.valueOf(day);
-//        str += "_";
+        /* str += "_"; */
         if(hour < 10) { str += "0"; }
         str += String.valueOf(hour);
         if(minute < 10) { str += "0"; }
@@ -372,10 +397,10 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     public String getCachePath(Context context) {
         String cachePath;
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || !Environment.isExternalStorageRemovable()) {
-        // 外部存储可用
+            // 外部存储可用
             cachePath = context.getExternalCacheDir().getPath() ;
         } else {
-//外部存储不可用
+            //外部存储不可用
             cachePath = context.getCacheDir().getPath() ;
         }
         return cachePath ;
@@ -396,6 +421,58 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     }
 
 
+
+
+
+    public static void saveImageToGallery(Context context, Bitmap image){
+
+
+        long mImageTime = System.currentTimeMillis();
+        String imageDate = getTime();
+        String PICTURE_SAVE_NAME_TEMPLATE = "img_%s.png";
+        String mImageFileName = String.format(PICTURE_SAVE_NAME_TEMPLATE, imageDate);
+
+        final ContentValues values = new ContentValues();
+        values.put(MediaStore.MediaColumns.RELATIVE_PATH, DIRECTORY_PICTURES + File.separator + "MyWardrobe");
+        values.put(MediaStore.MediaColumns.DISPLAY_NAME, mImageFileName);
+        values.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
+        values.put(MediaStore.MediaColumns.DATE_ADDED, mImageTime / 1000);
+        values.put(MediaStore.MediaColumns.DATE_MODIFIED, mImageTime / 1000);
+        values.put(MediaStore.MediaColumns.DATE_EXPIRES, (mImageTime + DateUtils.DAY_IN_MILLIS) / 1000);
+        values.put(MediaStore.MediaColumns.IS_PENDING, 1);
+        ContentResolver resolver = context.getContentResolver();
+
+        final Uri uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+        // uri提取，保存到静态
+        Log.d("HH", String.valueOf(uri));
+        mUri = uri;
+
+        try {
+            // First, write the actual data for our screenshot
+            try (OutputStream out = resolver.openOutputStream(uri)) {
+                if (!image.compress(Bitmap.CompressFormat.PNG, 100, out)) {
+                    throw new IOException("Failed to compress");
+                }
+            }
+            // Everything went well above, publish it!
+            values.clear();
+            values.put(MediaStore.MediaColumns.IS_PENDING, 0);
+            values.putNull(MediaStore.MediaColumns.DATE_EXPIRES);
+            resolver.update(uri, values, null, null);
+
+        }catch (IOException e){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                resolver.delete(uri, null);
+            }
+            /* G.look("Exception:"+e.toString()); */
+            e.printStackTrace();
+        } finally {
+            //将保存的uri转存为String，保存为path
+            path = String.valueOf(mUri);
+        }
+
+    }
 
 
 
