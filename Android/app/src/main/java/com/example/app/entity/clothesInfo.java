@@ -25,6 +25,8 @@ public class clothesInfo {
 
     // 图片地址
     public String imgPath = "Empty";
+    // 库存状态，0代表离库，1代表在库
+    public int status;
 
 
 }

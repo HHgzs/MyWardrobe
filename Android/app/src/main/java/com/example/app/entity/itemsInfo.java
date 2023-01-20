@@ -13,5 +13,7 @@ public class itemsInfo {
 
     // 图片地址
     public String imgPath = "null";
+    // 库存状态，0代表离库，1代表在库，大于1代表数量
+    public int status;
 
 }

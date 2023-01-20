@@ -71,7 +71,8 @@ public class ItemsDBHelper extends SQLiteOpenHelper {
                 " thickness INTEGER NOT NULL," +
                 " season INTEGER NOT NULL," +
                 " brief VARCHAR NOT NULL," +
-                " img_path VARCHAR NOT NULL);";
+                " img_path VARCHAR NOT NULL," +
+                " status INTEGER NOT NULL);";
         db.execSQL(sql);
 
         sql = "CREATE TABLE IF NOT EXISTS " + TABLE_ITEMS_INFO +
@@ -79,7 +80,8 @@ public class ItemsDBHelper extends SQLiteOpenHelper {
                 " name VARCHAR NOT NULL," +
                 " type INTEGER NOT NULL," +
                 " brief VARCHAR NOT NULL," +
-                " img_path VARCHAR NOT NULL);";
+                " img_path VARCHAR NOT NULL," +
+                " status INTEGER NOT NULL);";
         db.execSQL(sql);
 
 
@@ -103,6 +105,7 @@ public class ItemsDBHelper extends SQLiteOpenHelper {
             values.put("season",info.season);
             values.put("brief",info.brief);
             values.put("img_path",info.imgPath);
+            values.put("status",info.status);
             mWriteDB.insert(TABLE_CLOTHES_INFO,null,values);
             mWriteDB.setTransactionSuccessful();
         } catch (Exception e) {
@@ -120,6 +123,7 @@ public class ItemsDBHelper extends SQLiteOpenHelper {
             values.put("type",info.type);
             values.put("brief",info.brief);
             values.put("img_path",info.imgPath);
+            values.put("status",info.status);
             mWriteDB.insert(TABLE_ITEMS_INFO,null,values);
             mWriteDB.setTransactionSuccessful();
         } catch (Exception e) {
@@ -145,6 +149,7 @@ public class ItemsDBHelper extends SQLiteOpenHelper {
             info.season = cursor.getInt(5);
             info.brief = cursor.getString(6);
             info.imgPath = cursor.getString(7);
+            info.status = cursor.getInt(8);
             list.add(info);
         }
         cursor.close();
@@ -162,6 +167,7 @@ public class ItemsDBHelper extends SQLiteOpenHelper {
             info.type = cursor.getInt(2);
             info.brief = cursor.getString(3);
             info.imgPath = cursor.getString(4);
+            info.status = cursor.getInt(5);
             list.add(info);
         }
         cursor.close();

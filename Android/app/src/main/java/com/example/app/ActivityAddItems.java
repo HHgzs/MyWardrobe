@@ -42,6 +42,7 @@ import android.widget.TextView;
 import com.example.app.database.ItemsDBHelper;
 import com.example.app.entity.clothesInfo;
 import com.example.app.entity.itemsInfo;
+import com.example.app.entity.staticData;
 import com.example.app.util.DataService;
 import com.example.app.util.FileUtil;
 import com.google.android.material.snackbar.Snackbar;
@@ -76,6 +77,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     private EditText et_brief;
     private EditText et_items_brief;
     private ImageView iv_img_show;
+    private ImageView iv_img_show_2;
 
     // 物品首选分类分成衣橱内物品和其他物品，衣橱内用 0 表示，其他用 1 表示
     // clothing代表衣物，bedding代表床单被褥，clothes是上述两者总称呼
@@ -84,26 +86,27 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     private int clothes = 0;
 
     // 此处为spinner下拉菜单的适配器数组
-    private final static String[] clothingTypeArray = {"外套","外裤","衬衫","卫衣","内衣裤"};
-    private final static String[] beddingTypeArray = {"床单","被褥","其他"};
-    private final static String[] itemsTypeArray = {"摄影器材","工具","生活用品","电气设备","其他"};
-    private final static String[] thicknessArray = {"薄","中","厚"};
-    private final static String[] seasonArray = {"春秋","夏","冬"};
+    private static String[] clothingTypeArray = staticData.clothingTypeArray;
+    private static String[] beddingTypeArray = staticData.beddingTypeArray;
+    private static String[] itemsTypeArray = staticData.itemsTypeArray;
+    private static String[] thicknessArray = staticData.thicknessArray;
+    private static String[] seasonArray = staticData.seasonArray;
+
 
     private final int ALBUM_REQUEST_CODE = 1;
     private final int CROP_REQUEST_CODE = 2;
+    private final int OUT_STORE = 0;
+    private final int IN_STORE = 1;
 
-    private String directory;
-    private String rootDir;
     private static String path = null;
     private static Uri mUri;
-    private ActivityResultLauncher<Intent> registerCrop;
-
+    private ActivityResultLauncher<Intent> registerC;
 
     private clothesInfo mClothesInfo;
     private itemsInfo mItemsInfo;
     private ItemsDBHelper mDBHelper;
     private Bitmap bitmap = null;
+    private Bitmap bitmapCropped = null;
 
 
     @Override
@@ -132,6 +135,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         et_brief = findViewById(R.id.et_brief);
         et_items_brief = findViewById(R.id.et_items_brief);
         iv_img_show = findViewById(R.id.iv_img_show);
+        iv_img_show_2 = findViewById(R.id.iv_img_show_2);
 
         // 为图片添加按钮设置点击事件监听，弹出拍照或从相册选择按钮
         Button btn_add_img = (Button) findViewById(R.id.btn_add_img);
@@ -145,8 +149,6 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         // 创建数据对象
         mClothesInfo = new clothesInfo();
         mItemsInfo = new itemsInfo();
-        directory = getCachePath(this) + File.separatorChar;
-        rootDir = "/storage/Picture";
 
         mDBHelper = ItemsDBHelper.getInstance(this);
         mDBHelper.openReadLink();
@@ -164,7 +166,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        DataService instance = DataService.getInstance();
         // 接收打开相册选择的照片，
         if (requestCode == ALBUM_REQUEST_CODE) {
             if (data != null) {
@@ -175,27 +177,20 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-                saveImageToGallery(this, bitmap);
-
-                //  Uri uri2 = Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(), bitmap2, null,null));
-                //  显示已选照片 path源自原图
-                //  Uri uri2 = Uri.parse((String) path);
-                //  iv_img_show.setImageURI(uri2);
-
                 iv_img_show.setImageBitmap(bitmap);
+                instance.setEditBitmap(bitmap);
+                Intent intent_crop = new Intent(this,ActivityCropper.class);
+                startActivityForResult(intent_crop,CROP_REQUEST_CODE);
 
             }
         }
 
-        // 接收裁剪后的数据，存入全局变量 bitmap
+        //  接收裁剪后的数据，存入全局变量 bitmap
         if (requestCode == CROP_REQUEST_CODE) {
-            DataService instance = DataService.getInstance();
-            if (instance.getEditBitmap()!=null){
-                bitmap = instance.getEditBitmap();
-                iv_img_show.setImageBitmap(bitmap);
+            if (instance.getEditBitmap() != null){
+                bitmapCropped = instance.getEditBitmap();
+                iv_img_show_2.setImageBitmap(bitmapCropped);
             }
-
         }
     }
 
@@ -207,6 +202,9 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
                     show(this,"请输入物品名称");
                     break;
                 }
+
+                // 保存已裁切图片
+                saveImageToGallery(this, bitmapCropped);
 
                 if (mItems == 0) {
                     mClothesInfo.name = et_name.getText().toString();
@@ -220,6 +218,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
                     mClothesInfo.season = sp_clothes_season.getSelectedItemPosition();
                     mClothesInfo.brief = et_brief.getText().toString();
                     mClothesInfo.imgPath = path;
+                    mClothesInfo.status = IN_STORE;
 
                     // 向clothes数据库插入项
                     mDBHelper.insertClothesInfo(mClothesInfo);
@@ -229,10 +228,10 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
                     mItemsInfo.type = sp_items_type.getSelectedItemPosition();
                     mItemsInfo.brief = et_items_brief.getText().toString();
                     mItemsInfo.imgPath = path;
+                    mItemsInfo.status = IN_STORE;
 
                     // 向clothes数据库插入项
                     mDBHelper.insertItemsInfo(mItemsInfo);
-
                 }
 
                 finish();
@@ -302,6 +301,15 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("HH","Activity_Add_Item onResume");
+//        DataService instance = DataService.getInstance();
+//        if (instance.getEditBitmap() != null) {
+//            iv_img_show_2.setImageBitmap(instance.getEditBitmap());
+//        }
+    }
 
     // 显示下方弹出列表
     private void showPopupWindow() {
@@ -407,6 +415,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     }
 
 
+
     @Nullable
     File getAppSpecificAlbumStorageDir(Context context, String albumName) {
         // Get the pictures directory that's inside the app-specific directory on
@@ -461,7 +470,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
             values.putNull(MediaStore.MediaColumns.DATE_EXPIRES);
             resolver.update(uri, values, null, null);
 
-        }catch (IOException e){
+        } catch (IOException e){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 resolver.delete(uri, null);
             }
@@ -473,9 +482,6 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         }
 
     }
-
-
-
 
 
 

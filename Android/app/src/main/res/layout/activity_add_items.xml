@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".ActivityAddItems"
     android:orientation="vertical"
-    android:paddingTop="20dp"
+    android:paddingTop="30dp"
     android:paddingLeft="30dp"
     android:paddingRight="30dp"
     android:paddingBottom="20dp">
@@ -66,6 +66,12 @@
 
         <ImageView
             android:id="@+id/iv_img_show"
+            android:layout_weight="1"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"/>
+
+        <ImageView
+            android:id="@+id/iv_img_show_2"
             android:layout_weight="1"
             android:layout_width="80dp"
             android:layout_height="match_parent"/>

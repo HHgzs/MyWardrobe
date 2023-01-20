@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.app.util.PermissionUtil;
@@ -19,7 +20,7 @@ public class ActivityHome extends AppCompatActivity implements View.OnClickListe
     private ImageView wardrobe_button;
     private ImageView home_button;
     private ImageView blotter_button;
-    private ImageView float_button;
+    private Button float_button;
 
     private static final int REQUEST_CODE_STORAGE = 1;
     private static final String[] PERMISSIONS = new String[]{
