@@ -98,8 +98,8 @@ public class ActivityCropper extends AppCompatActivity implements View.OnClickLi
         intent.putExtra("aspectX", 1);
         intent.putExtra("aspectY", 1);
         // outputX outputY 是裁剪图片宽高
-        intent.putExtra("outputX", 500);
-        intent.putExtra("outputY", 500);
+        intent.putExtra("outputX", 150);
+        intent.putExtra("outputY", 150);
         // 返回裁剪后的数据
         intent.putExtra("return-data", true);
         startActivityForResult(intent, PICTURE_CROPPING_CODE);

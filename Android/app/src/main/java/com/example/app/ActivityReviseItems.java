@@ -1,68 +1,58 @@
 package com.example.app;
 
-import static android.os.Environment.DIRECTORY_PICTURES;
-import static android.os.Environment.getExternalStoragePublicDirectory;
-import static androidx.core.content.PackageManagerCompat.LOG_TAG;
-import static com.example.app.util.ToastUtil.show;
+        import static android.os.Environment.DIRECTORY_PICTURES;
+        import static com.example.app.util.ToastUtil.show;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.provider.SyncStateContract;
-import android.text.format.DateUtils;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
-import android.widget.RadioGroup;
-import android.widget.Spinner;
-import android.widget.TextView;
-
-import com.example.app.database.ItemsDBHelper;
-import com.example.app.entity.clothesInfo;
-import com.example.app.entity.itemsInfo;
-import com.example.app.entity.staticData;
-import com.example.app.util.DataService;
-import com.example.app.util.FileUtil;
-import com.google.android.material.snackbar.Snackbar;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.util.Calendar;
-import java.util.Date;
-
-import kotlin.jvm.internal.PropertyReference0Impl;
+        import androidx.activity.result.ActivityResultLauncher;
+        import androidx.appcompat.app.AppCompatActivity;
 
 
-public class ActivityAddItems extends AppCompatActivity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
+        import android.content.ContentResolver;
+        import android.content.ContentValues;
+        import android.content.Context;
+        import android.content.Intent;
+        import android.graphics.Bitmap;
+        import android.net.Uri;
+        import android.os.Build;
+        import android.os.Bundle;
+        import android.provider.MediaStore;
+        import android.text.format.DateUtils;
+        import android.util.Log;
+        import android.view.Gravity;
+        import android.view.LayoutInflater;
+        import android.view.View;
+        import android.widget.AdapterView;
+        import android.widget.ArrayAdapter;
+        import android.widget.Button;
+        import android.widget.EditText;
+        import android.widget.ImageView;
+        import android.widget.LinearLayout;
+        import android.widget.PopupWindow;
+        import android.widget.RadioButton;
+        import android.widget.RadioGroup;
+        import android.widget.Spinner;
+        import android.widget.TextView;
 
-    private RadioGroup rg_clothes_or_items;
+        import com.example.app.database.ItemsDBHelper;
+        import com.example.app.entity.clothesInfo;
+        import com.example.app.entity.itemsInfo;
+        import com.example.app.entity.staticData;
+        import com.example.app.util.DataService;
+
+
+
+        import java.io.File;
+        import java.io.IOException;
+        import java.io.OutputStream;
+        import java.util.Calendar;
+
+
+
+public class ActivityReviseItems extends AppCompatActivity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
+
     private RadioGroup rg_clothes;
+    private RadioButton rb_clothing;
+    private RadioButton rb_bedding;
     private LinearLayout layout_items;
     private LinearLayout layout_clothes;
     private LinearLayout ll_beddingType;
@@ -84,6 +74,8 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     // clothing用 0 表示，bedding用 1 表示
     private int mItems = 0;
     private int clothes = 0;
+    // 传入id，作为保存依据
+    private int id;
 
     // 此处为spinner下拉菜单的适配器数组
     private static String[] clothingTypeArray = staticData.clothingTypeArray;
@@ -99,7 +91,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     private final int IN_STORE = 1;
 
     private static String path = null;
-    private static Uri mUri = null;
+    private static Uri mUri;
     private ActivityResultLauncher<Intent> registerC;
 
     private clothesInfo mClothesInfo;
@@ -112,13 +104,13 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_items);
+        setContentView(R.layout.activity_revise_items);
 
-        rg_clothes_or_items = findViewById(R.id.rg_clothes_or_items);
-        rg_clothes_or_items.setOnCheckedChangeListener(this);
 
         rg_clothes = findViewById(R.id.rg_type);
         rg_clothes.setOnCheckedChangeListener(this);
+        rb_clothing = findViewById(R.id.rb_clothing);
+        rb_bedding = findViewById(R.id.rb_bedding);
 
         layout_clothes = (LinearLayout) findViewById(R.id.layout_clothes);
         layout_items = (LinearLayout) findViewById(R.id.layout_items);
@@ -146,18 +138,23 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         findViewById(R.id.btn_delete).setOnClickListener(this);
         findViewById(R.id.btn_crop_img).setOnClickListener(this);
 
-        // 创建数据对象
-        mClothesInfo = new clothesInfo();
-        mItemsInfo = new itemsInfo();
-
         mDBHelper = ItemsDBHelper.getInstance(this);
         mDBHelper.openReadLink();
         mDBHelper.openWriteLink();
+
+        // 接收数据，设置id，设置初始数据
+        Bundle bundle = getIntent().getExtras();
+        mItems = bundle.getInt("mItems");
+        id = bundle.getInt("id");
+
+        setType();
         // 初始化下拉列表
         initSpinner();
+        // 初始化数据
+        setData();
+
+
     }
-
-
 
 
 
@@ -177,7 +174,6 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
                     e.printStackTrace();
                 }
                 iv_img_show.setImageBitmap(bitmap);
-
                 instance.setEditBitmap(bitmap);
                 Intent intent_crop = new Intent(this,ActivityCropper.class);
                 startActivityForResult(intent_crop,CROP_REQUEST_CODE);
@@ -204,10 +200,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
                 }
 
                 // 保存已裁切图片
-                if (bitmapCropped != null) {
-                    saveImageToGallery(this, bitmapCropped);
-                }
-
+                saveImageToGallery(this, bitmapCropped);
 
                 if (mItems == 0) {
                     mClothesInfo.name = et_name.getText().toString();
@@ -280,16 +273,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
         switch (checkedId) {
-            case R.id.rb_clothes:
-                layout_clothes.setVisibility(View.VISIBLE);
-                layout_items.setVisibility(View.GONE);
-                mItems = 0;
-                break;
-            case R.id.rb_items:
-                layout_clothes.setVisibility(View.GONE);
-                layout_items.setVisibility(View.VISIBLE);
-                mItems = 1;
-                break;
+
             case R.id.rb_clothing:
                 ll_clothingType.setVisibility(View.VISIBLE);
                 ll_beddingType.setVisibility(View.GONE);
@@ -303,17 +287,6 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
 
         }
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d("HH","Activity_Add_Item onResume");
-//        DataService instance = DataService.getInstance();
-//        if (instance.getEditBitmap() != null) {
-//            iv_img_show_2.setImageBitmap(instance.getEditBitmap());
-//        }
-    }
-
 
 
     // 显示下方弹出列表
@@ -407,36 +380,6 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     }
 
 
-    public String getCachePath(Context context) {
-        String cachePath;
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || !Environment.isExternalStorageRemovable()) {
-            // 外部存储可用
-            cachePath = context.getExternalCacheDir().getPath() ;
-        } else {
-            //外部存储不可用
-            cachePath = context.getCacheDir().getPath() ;
-        }
-        return cachePath ;
-    }
-
-
-
-    @Nullable
-    File getAppSpecificAlbumStorageDir(Context context, String albumName) {
-        // Get the pictures directory that's inside the app-specific directory on
-        // external storage.
-        File file = new File(context.getExternalFilesDir(
-                Environment.DIRECTORY_PICTURES), albumName);
-        if (file == null || !file.mkdirs()) {
-            Log.e("HH", "Directory not created");
-        }
-
-        return file;
-    }
-
-
-
-
 
     public static void saveImageToGallery(Context context, Bitmap image){
 
@@ -487,7 +430,53 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
 
     }
 
+    // 根据上级Activity设置类型clothes或items,以及对象的基本数据
+    private void setType() {
+        if (mItems == 0) {
+            layout_clothes.setVisibility(View.VISIBLE);
+            layout_items.setVisibility(View.GONE);
+            mClothesInfo =  mDBHelper.queryClothesInfoByID(id);
+            clothes = mClothesInfo.basicType;
+
+            et_name.setText(mClothesInfo.name);
+            iv_img_show.setImageURI(Uri.parse(mClothesInfo.imgPath));
+            et_brief.setText(mClothesInfo.brief);
 
 
+        } else if (mItems == 1) {
+            layout_clothes.setVisibility(View.GONE);
+            layout_items.setVisibility(View.VISIBLE);
+            mItemsInfo = mDBHelper.queryItemsInfoByID(id);
+        }
+
+
+    }
+
+    // 根据setType设置的基本数据，初始化基本信息，将原数据展示出来
+    private void setData() {
+        if (mItems == 0) {
+            if (clothes == 0) {
+                rb_clothing.setChecked(true);
+                rb_bedding.setChecked(false);
+            } else if (clothes == 1) {
+                rb_clothing.setChecked(false);
+                rb_bedding.setChecked(true);
+            }
+
+
+
+
+
+
+
+        } else if (mItems == 1) {
+
+        }
+
+
+
+
+
+    }
 
 }

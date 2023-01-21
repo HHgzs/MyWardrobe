@@ -82,11 +82,20 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         ToastUtil.show(this, "条目被点击了，" + clothesInfoList.get(position).name);
+
+        Intent intent = new Intent(this,ActivityReviseItems.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt("id",clothesInfoList.get(position).id);
+        bundle.putInt("mItems",0);
+        intent.putExtras(bundle);
+        startActivity(intent);
+
     }
+
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
+        ToastUtil.show(this, "条目被长按了，" + clothesInfoList.get(position).name);
         return false;
     }
 }

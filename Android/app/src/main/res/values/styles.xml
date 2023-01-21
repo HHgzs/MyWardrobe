@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="floatUp">
+
+        <item name="android:activityOpenEnterAnimation">@anim/activity_anim_1</item>
+        <item name="android:activityOpenExitAnimation">@anim/activity_anim_2</item>
+        <item name="android:activityCloseEnterAnimation">@anim/activity_anim_3</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_anim_4</item>
+
+    </style>
+
+</resources>

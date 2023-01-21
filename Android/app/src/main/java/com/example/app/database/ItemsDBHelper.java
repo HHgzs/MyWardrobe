@@ -115,6 +115,7 @@ public class ItemsDBHelper extends SQLiteOpenHelper {
         }
     }
 
+
     public void insertItemsInfo(itemsInfo info) {
         try {
             mWriteDB.beginTransaction();
@@ -132,7 +133,6 @@ public class ItemsDBHelper extends SQLiteOpenHelper {
             mWriteDB.endTransaction();
         }
     }
-
 
 
     public List<clothesInfo> queryAllClothesInfo() {
@@ -156,6 +156,7 @@ public class ItemsDBHelper extends SQLiteOpenHelper {
         return list;
     }
 
+
     public List<itemsInfo> queryAllItemsInfo() {
         String sql = "select * from " + TABLE_ITEMS_INFO;
         List<itemsInfo> list = new ArrayList<>();
@@ -174,6 +175,78 @@ public class ItemsDBHelper extends SQLiteOpenHelper {
         return list;
     }
 
+
+    public clothesInfo queryClothesInfoByID(int clothesID) {
+        clothesInfo info = null;
+        Cursor cursor = mReadDB.query(TABLE_CLOTHES_INFO,null,"_id=?",new String[]{String.valueOf(clothesID)},null,null,null);
+        if (cursor.moveToNext()) {
+            info = new clothesInfo();
+            info.id = cursor.getInt(0);
+            info.name = cursor.getString(1);
+            info.basicType = cursor.getInt(2);
+            info.secondType = cursor.getInt(3);
+            info.thickness = cursor.getInt(4);
+            info.season = cursor.getInt(5);
+            info.brief = cursor.getString(6);
+            info.imgPath = cursor.getString(7);
+            info.status = cursor.getInt(8);
+        }
+        return info;
+    }
+
+
+    public itemsInfo queryItemsInfoByID(int itemsID) {
+        itemsInfo info = null;
+        Cursor cursor = mReadDB.query(TABLE_ITEMS_INFO,null,"_id=?",new String[]{String.valueOf(itemsID)},null,null,null);
+        if (cursor.moveToNext()) {
+            info.id = cursor.getInt(0);
+            info.name = cursor.getString(1);
+            info.type = cursor.getInt(2);
+            info.brief = cursor.getString(3);
+            info.imgPath = cursor.getString(4);
+            info.status = cursor.getInt(5);
+        }
+        return info;
+    }
+
+
+    public void reviseClothesInfo(clothesInfo info) {
+        try {
+            mWriteDB.beginTransaction();
+            ContentValues values = new ContentValues();
+            values.put("name",info.name);
+            values.put("basic_type",info.basicType);
+            values.put("second_type",info.secondType);
+            values.put("thickness",info.thickness);
+            values.put("season",info.season);
+            values.put("brief",info.brief);
+            values.put("img_path",info.imgPath);
+            values.put("status",info.status);
+            mWriteDB.update(TABLE_CLOTHES_INFO,values,"_id=?",new String[]{String.valueOf(info.id)});
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void reviseItemsInfo(itemsInfo info) {
+        try {
+            mWriteDB.beginTransaction();
+            ContentValues values = new ContentValues();
+            values.put("name",info.name);
+            values.put("type",info.type);
+            values.put("brief",info.brief);
+            values.put("img_path",info.imgPath);
+            values.put("status",info.status);
+            mWriteDB.update(TABLE_ITEMS_INFO,values,"_id=?",new String[]{String.valueOf(info.id)});
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public void deleteAllInfo() {
         mWriteDB.delete(TABLE_CLOTHES_INFO,"1=1",null);
         mWriteDB.delete(TABLE_ITEMS_INFO,"1=1",null);
@@ -187,16 +260,6 @@ public class ItemsDBHelper extends SQLiteOpenHelper {
         db.execSQL("delete from " + TABLE_CLOTHES_INFO);
         db.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = " + TABLE_CLOTHES_INFO);
     }
-
-
-
-
-
-
-
-
-
-
 
 
 }

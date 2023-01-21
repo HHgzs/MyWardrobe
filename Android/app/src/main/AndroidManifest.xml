@@ -22,6 +22,14 @@
         android:theme="@style/Theme.App"
         tools:targetApi="31">
         <activity
+            android:name=".ActivityReviseItems"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:theme="@style/Theme.App"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".ActivityCropper"
             android:exported="false">
             <meta-data
@@ -37,6 +45,7 @@
         </activity>
         <activity
             android:name=".ActivityBlotter"
+
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
@@ -44,6 +53,7 @@
         </activity>
         <activity
             android:name=".ActivityWardrobe"
+
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
@@ -51,6 +61,7 @@
         </activity>
         <activity
             android:name=".ActivityHome"
+
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
