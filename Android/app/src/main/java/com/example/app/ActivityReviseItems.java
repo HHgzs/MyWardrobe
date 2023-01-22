@@ -200,7 +200,10 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
                 }
 
                 // 保存已裁切图片
-                saveImageToGallery(this, bitmapCropped);
+                if (bitmapCropped != null) {
+                    saveImageToGallery(this, bitmapCropped);
+                }
+
 
                 if (mItems == 0) {
                     mClothesInfo.name = et_name.getText().toString();
@@ -439,7 +442,8 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
             clothes = mClothesInfo.basicType;
 
             et_name.setText(mClothesInfo.name);
-            iv_img_show.setImageURI(Uri.parse(mClothesInfo.imgPath));
+            path = mClothesInfo.imgPath;
+            iv_img_show.setImageURI(Uri.parse(path));
             et_brief.setText(mClothesInfo.brief);
 
 
@@ -447,6 +451,9 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
             layout_clothes.setVisibility(View.GONE);
             layout_items.setVisibility(View.VISIBLE);
             mItemsInfo = mDBHelper.queryItemsInfoByID(id);
+            et_name.setText(mItemsInfo.name);
+            path = mItemsInfo.imgPath;
+            iv_img_show.setImageURI(Uri.parse(path));
         }
 
 
@@ -458,18 +465,22 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
             if (clothes == 0) {
                 rb_clothing.setChecked(true);
                 rb_bedding.setChecked(false);
+                sp_clothing_type.setSelection(mClothesInfo.secondType);
+
             } else if (clothes == 1) {
                 rb_clothing.setChecked(false);
                 rb_bedding.setChecked(true);
+                sp_bedding_type.setSelection(mClothesInfo.secondType);
             }
 
-
-
-
-
+            sp_clothes_thickness.setSelection(mClothesInfo.thickness);
+            sp_clothes_season.setSelection(mClothesInfo.season);
+            et_brief.setText(mClothesInfo.brief);
 
 
         } else if (mItems == 1) {
+            sp_items_type.setSelection(mItemsInfo.type);
+            et_items_brief.setText(mItemsInfo.brief);
 
         }
 

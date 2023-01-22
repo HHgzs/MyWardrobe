@@ -488,6 +488,4 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     }
 
 
-
-
 }
