@@ -1,5 +1,7 @@
 package com.example.app;
 
+import static com.example.app.util.ToastUtil.show;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,8 +21,8 @@ public class ActivityCropper extends AppCompatActivity implements View.OnClickLi
 
     public static final int PICTURE_CROPPING_CODE = 200;
 
-    private Bitmap bitmap =null;
-    private Bitmap bitmapCropped =null;
+    private Bitmap bitmap = null;
+    private Bitmap bitmapCropped = null;
     private ImageView iv_picture;
     private Uri uri;
     private boolean cropped = false;
@@ -37,13 +39,15 @@ public class ActivityCropper extends AppCompatActivity implements View.OnClickLi
 
         if (instance.getEditBitmap() != null && cropped == false) {
             bitmap = instance.getEditBitmap();
-            uri = Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, null,null));
+            iv_picture.setImageBitmap(bitmap);
+
         }
-        iv_picture.setImageURI(uri);
+
 
         if (cropped == false) {
             try {
                 cropped = true;
+                uri = Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, null,null));
                 pictureCropping(uri);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -75,12 +79,22 @@ public class ActivityCropper extends AppCompatActivity implements View.OnClickLi
         switch (v.getId()) {
             case R.id.btn_crop_save:
                 DataService instance = DataService.getInstance();
-                instance.setEditBitmap(bitmapCropped);
-                finish();
+                if (bitmapCropped != null) {
+                    instance.setEditBitmap(bitmapCropped);
+                    finish();
+                } else {
+                    show(this,"请进行裁切");
+                }
                 break;
 
             case R.id.btn_crop_again:
-                pictureCropping(uri);
+                try {
+                    cropped = true;
+                    uri = Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, null,null));
+                    pictureCropping(uri);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
         }
     }

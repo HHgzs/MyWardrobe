@@ -24,7 +24,7 @@ public class clothesInfo {
     public String brief;
 
     // 图片地址
-    public String imgPath = "Empty";
+    public String imgPath = staticData.EMPTY;
     // 库存状态，0代表离库，1代表在库
     public int status;
 

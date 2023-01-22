@@ -8,4 +8,12 @@ public class staticData {
     public final static String[] seasonArray = {"春秋","夏","冬"};
     public final static String[] statusArray = {"离库","在库"};
 
+    public final static String EMPTY = "Empty";
+    public final static int OUT_STORE = 0;
+    public final static int IN_STORE = 1;
+
+
+
+
+
 }

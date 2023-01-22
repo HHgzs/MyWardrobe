@@ -1,28 +1,20 @@
 package com.example.app;
 
 import static android.os.Environment.DIRECTORY_PICTURES;
-import static android.os.Environment.getExternalStoragePublicDirectory;
-import static androidx.core.content.PackageManagerCompat.LOG_TAG;
+import static com.example.app.entity.staticData.IN_STORE;
 import static com.example.app.util.ToastUtil.show;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.provider.SyncStateContract;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -39,30 +31,28 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.app.database.ItemsDBHelper;
 import com.example.app.entity.clothesInfo;
 import com.example.app.entity.itemsInfo;
 import com.example.app.entity.staticData;
 import com.example.app.util.DataService;
-import com.example.app.util.FileUtil;
-import com.google.android.material.snackbar.Snackbar;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 
-import kotlin.jvm.internal.PropertyReference0Impl;
+
+
 
 
 public class ActivityAddItems extends AppCompatActivity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
 
-    private RadioGroup rg_clothes_or_items;
-    private RadioGroup rg_clothes;
     private LinearLayout layout_items;
     private LinearLayout layout_clothes;
     private LinearLayout ll_beddingType;
@@ -86,21 +76,19 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     private int clothes = 0;
 
     // 此处为spinner下拉菜单的适配器数组
-    private static String[] clothingTypeArray = staticData.clothingTypeArray;
-    private static String[] beddingTypeArray = staticData.beddingTypeArray;
-    private static String[] itemsTypeArray = staticData.itemsTypeArray;
-    private static String[] thicknessArray = staticData.thicknessArray;
-    private static String[] seasonArray = staticData.seasonArray;
+    private static final String[] clothingTypeArray = staticData.clothingTypeArray;
+    private static final String[] beddingTypeArray = staticData.beddingTypeArray;
+    private static final String[] itemsTypeArray = staticData.itemsTypeArray;
+    private static final String[] thicknessArray = staticData.thicknessArray;
+    private static final String[] seasonArray = staticData.seasonArray;
 
 
     private final int ALBUM_REQUEST_CODE = 1;
     private final int CROP_REQUEST_CODE = 2;
-    private final int OUT_STORE = 0;
-    private final int IN_STORE = 1;
 
-    private static String path = null;
-    private static Uri mUri = null;
-    private ActivityResultLauncher<Intent> registerC;
+    private static String path = staticData.EMPTY;
+    private static final Uri mUri = null;
+    private ActivityResultLauncher<Intent> register;
 
     private clothesInfo mClothesInfo;
     private itemsInfo mItemsInfo;
@@ -114,16 +102,16 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_items);
 
-        rg_clothes_or_items = findViewById(R.id.rg_clothes_or_items);
+        RadioGroup rg_clothes_or_items = findViewById(R.id.rg_clothes_or_items);
         rg_clothes_or_items.setOnCheckedChangeListener(this);
 
-        rg_clothes = findViewById(R.id.rg_type);
+        RadioGroup rg_clothes = findViewById(R.id.rg_type);
         rg_clothes.setOnCheckedChangeListener(this);
 
-        layout_clothes = (LinearLayout) findViewById(R.id.layout_clothes);
-        layout_items = (LinearLayout) findViewById(R.id.layout_items);
-        ll_clothingType = (LinearLayout) findViewById(R.id.ll_clothingType);
-        ll_beddingType = (LinearLayout) findViewById(R.id.ll_beddingType);
+        layout_clothes = findViewById(R.id.layout_clothes);
+        layout_items = findViewById(R.id.layout_items);
+        ll_clothingType = findViewById(R.id.ll_clothingType);
+        ll_beddingType = findViewById(R.id.ll_beddingType);
 
         sp_clothing_type = findViewById(R.id.sp_clothing_type);
         sp_bedding_type = findViewById(R.id.sp_bedding_type);
@@ -136,15 +124,17 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         et_items_brief = findViewById(R.id.et_items_brief);
         iv_img_show = findViewById(R.id.iv_img_show);
         iv_img_show_2 = findViewById(R.id.iv_img_show_2);
+        iv_img_show.setImageResource(R.drawable.img_null);
 
         // 为图片添加按钮设置点击事件监听，弹出拍照或从相册选择按钮
-        Button btn_add_img = (Button) findViewById(R.id.btn_add_img);
+        Button btn_add_img = findViewById(R.id.btn_add_img);
         btn_add_img.setOnClickListener(v -> showPopupWindow());
 
         findViewById(R.id.btn_save).setOnClickListener(this);
         findViewById(R.id.btn_exit).setOnClickListener(this);
         findViewById(R.id.btn_delete).setOnClickListener(this);
         findViewById(R.id.btn_crop_img).setOnClickListener(this);
+        findViewById(R.id.btn_test).setOnClickListener(this);
 
         // 创建数据对象
         mClothesInfo = new clothesInfo();
@@ -194,6 +184,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -205,7 +196,9 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
 
                 // 保存已裁切图片
                 if (bitmapCropped != null) {
-                    saveImageToGallery(this, bitmapCropped);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        saveImageToGallery(this, bitmapCropped);
+                    }
                 }
 
 
@@ -248,6 +241,12 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
                 mDBHelper.dataInit();
                 break;
 
+            case R.id.btn_test:
+                String filePath = Arrays.toString(getExternalFilesDirs(DIRECTORY_PICTURES));
+                Log.d("HH","btn_getPath : " + filePath );
+
+                break;
+
             case R.id.btn_crop_img:
                 DataService instance = DataService.getInstance();
                 instance.setEditBitmap(bitmap);
@@ -277,6 +276,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
 
 
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
         switch (checkedId) {
@@ -308,25 +308,21 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     protected void onResume() {
         super.onResume();
         Log.d("HH","Activity_Add_Item onResume");
-//        DataService instance = DataService.getInstance();
-//        if (instance.getEditBitmap() != null) {
-//            iv_img_show_2.setImageBitmap(instance.getEditBitmap());
-//        }
     }
 
 
 
     // 显示下方弹出列表
     private void showPopupWindow() {
-        View contentView = LayoutInflater.from(this).inflate(R.layout.popupwindow_add_img,null);
+        @SuppressLint("InflateParams") View contentView = LayoutInflater.from(this).inflate(R.layout.popupwindow_add_img,null);
         mPopWindow = new PopupWindow(contentView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT,true);
         mPopWindow.setContentView(contentView);
 
-        TextView pop_btn_catch = (TextView) contentView.findViewById(R.id.pop_btn_catch);
-        TextView pop_btn_album = (TextView) contentView.findViewById(R.id.pop_btn_album);
+        TextView pop_btn_catch = contentView.findViewById(R.id.pop_btn_catch);
+        TextView pop_btn_album = contentView.findViewById(R.id.pop_btn_album);
         pop_btn_catch.setOnClickListener(this);
         pop_btn_album.setOnClickListener(this);
-        View rootView = LayoutInflater.from(this).inflate(R.layout.activity_add_items,null);
+        @SuppressLint("InflateParams") View rootView = LayoutInflater.from(this).inflate(R.layout.activity_add_items,null);
         mPopWindow.showAtLocation(rootView, Gravity.BOTTOM,0,0);
 
 
@@ -407,39 +403,38 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     }
 
 
-    public String getCachePath(Context context) {
-        String cachePath;
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || !Environment.isExternalStorageRemovable()) {
-            // 外部存储可用
-            cachePath = context.getExternalCacheDir().getPath() ;
-        } else {
-            //外部存储不可用
-            cachePath = context.getCacheDir().getPath() ;
-        }
-        return cachePath ;
-    }
+//    public String getCachePath(Context context) {
+//        String cachePath;
+//        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || !Environment.isExternalStorageRemovable()) {
+//            // 外部存储可用
+//            cachePath = context.getExternalCacheDir().getPath() ;
+//        } else {
+//            //外部存储不可用
+//            cachePath = context.getCacheDir().getPath() ;
+//        }
+//        return cachePath ;
+//    }
 
 
 
-    @Nullable
-    File getAppSpecificAlbumStorageDir(Context context, String albumName) {
-        // Get the pictures directory that's inside the app-specific directory on
-        // external storage.
-        File file = new File(context.getExternalFilesDir(
-                Environment.DIRECTORY_PICTURES), albumName);
-        if (file == null || !file.mkdirs()) {
-            Log.e("HH", "Directory not created");
-        }
-
-        return file;
-    }
-
-
+//    @Nullable
+//    File getAppSpecificAlbumStorageDir(Context context, String albumName) {
+//        // Get the pictures directory that's inside the app-specific directory on
+//        // external storage.
+//        File file = new File(context.getExternalFilesDir(
+//                Environment.DIRECTORY_PICTURES), albumName);
+//        if (file == null || !file.mkdirs()) {
+//            Log.e("HH", "Directory not created");
+//        }
+//
+//        return file;
+//    }
 
 
 
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     public static void saveImageToGallery(Context context, Bitmap image){
-
 
         long mImageTime = System.currentTimeMillis();
         String imageDate = getTime();
@@ -458,9 +453,11 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
 
         final Uri uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
 
-        // uri提取，保存到静态
-        Log.d("HH", String.valueOf(uri));
-        mUri = uri;
+
+
+        String croppedPath = getRealFilePath(context,uri);
+
+        Log.d("HH", croppedPath);
 
         try {
             // First, write the actual data for our screenshot
@@ -482,10 +479,46 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
             e.printStackTrace();
         } finally {
             //将保存的uri转存为String，保存为path
-            path = String.valueOf(mUri);
+            path = croppedPath;
         }
 
     }
+
+
+
+
+    public static String getRealFilePath( final Context context,final Uri uri ) {
+        if (null == uri)
+            return null;
+        final String scheme = uri.getScheme();
+        String data = null;
+
+        if (scheme == null)
+            data = uri.getPath();
+
+        else if (ContentResolver.SCHEME_FILE.equals(scheme)) {
+            data = uri.getPath();
+        } else if (ContentResolver.SCHEME_CONTENT.equals(scheme) ) {
+            Cursor cursor = context.getContentResolver().query(uri,new String[] { MediaStore.Images.ImageColumns.DATA },null,null );
+
+            if (null != cursor) {
+                if (cursor.moveToFirst()) {
+                    int index = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                    if (index > -1) {
+                        data = cursor.getString(index);
+                    }
+                }
+                cursor.close();
+            }
+        }
+        return data;
+
+    }
+
+
+
+
+
 
 
 }

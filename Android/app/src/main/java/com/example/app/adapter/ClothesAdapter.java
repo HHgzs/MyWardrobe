@@ -1,6 +1,7 @@
 package com.example.app.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,9 +14,12 @@ import android.widget.TextView;
 
 import com.example.app.R;
 import com.example.app.entity.clothesInfo;
+import com.example.app.entity.staticData;
+import com.example.app.util.FileUtil;
 import com.example.app.util.ToastUtil;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ClothesAdapter extends BaseAdapter {
 
@@ -72,7 +76,18 @@ public class ClothesAdapter extends BaseAdapter {
         clothesInfo clothesInfo = mClothesInfoList.get(position);
         holder.ll_list_clothes.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
 
-        holder.iv_list_clothes_img.setImageURI(Uri.parse(clothesInfo.imgPath));
+        if (!Objects.equals(clothesInfo.imgPath, staticData.EMPTY)) {
+            Bitmap bitmap = null;
+            // 根据imgPath读取图像为Bitmap或uri并显示出来
+            String path = clothesInfo.imgPath;
+            bitmap = FileUtil.openImage(path);
+            holder.iv_list_clothes_img.setImageBitmap(bitmap);
+
+
+        } else {
+            holder.iv_list_clothes_img.setImageResource(R.drawable.img_null);
+        }
+
         holder.tv_list_clothes_name.setText(clothesInfo.name);
         holder.tv_list_clothes_desc.setText(clothesInfo.brief);
         holder.btn_edit.setOnClickListener(v -> {
@@ -89,18 +104,5 @@ public class ClothesAdapter extends BaseAdapter {
         public TextView tv_list_clothes_desc;
         public Button btn_edit;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

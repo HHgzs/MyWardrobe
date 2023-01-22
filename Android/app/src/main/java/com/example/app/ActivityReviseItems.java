@@ -90,7 +90,7 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
     private final int OUT_STORE = 0;
     private final int IN_STORE = 1;
 
-    private static String path = null;
+    private static String path = staticData.EMPTY;
     private static Uri mUri;
     private ActivityResultLauncher<Intent> registerC;
 
