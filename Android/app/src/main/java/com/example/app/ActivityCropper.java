@@ -2,18 +2,17 @@ package com.example.app;
 
 import static com.example.app.util.ToastUtil.show;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ImageView;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.app.util.DataService;
 
@@ -37,14 +36,14 @@ public class ActivityCropper extends AppCompatActivity implements View.OnClickLi
         iv_picture = findViewById(R.id.iv_picture);
         DataService instance = DataService.getInstance();
 
-        if (instance.getEditBitmap() != null && cropped == false) {
+        if (instance.getEditBitmap() != null && !cropped) {
             bitmap = instance.getEditBitmap();
             iv_picture.setImageBitmap(bitmap);
 
         }
 
 
-        if (cropped == false) {
+        if (!cropped) {
             try {
                 cropped = true;
                 uri = Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, null,null));
@@ -60,6 +59,7 @@ public class ActivityCropper extends AppCompatActivity implements View.OnClickLi
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICTURE_CROPPING_CODE && resultCode == RESULT_OK) {
             // 图片剪裁返回
+            assert data != null;
             Uri uriCropped = data.getData();
             try {
                 // 获得剪裁后的Bitmap对象
@@ -74,6 +74,7 @@ public class ActivityCropper extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -118,6 +119,9 @@ public class ActivityCropper extends AppCompatActivity implements View.OnClickLi
         intent.putExtra("return-data", true);
         startActivityForResult(intent, PICTURE_CROPPING_CODE);
     }
+
+
+
 
 }
 

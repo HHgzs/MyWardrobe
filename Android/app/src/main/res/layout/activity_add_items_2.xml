@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ActivityAddItems"
+    android:orientation="vertical"
+    android:background="@drawable/add_items_background"
+    android:paddingTop="40dp"
+    android:paddingLeft="40dp"
+    android:paddingRight="40dp"
+    android:paddingBottom="20dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="添加物品"
+        android:layout_marginLeft="10dp"
+        android:textColor="@color/Pink_1"
+        android:textSize="30sp"/>
+
+
+    <RadioGroup
+        android:id="@+id/rg_clothes_or_items"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:layout_margin="5dp"
+        >
+
+        <RadioButton
+            android:id="@+id/rb_clothes"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:buttonTint="@color/transparent00"
+            android:background="@drawable/radio_button_selector"
+            android:textSize="20sp"
+            android:scaleX="1"
+            android:scaleY="1"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:gravity="center|left"
+            android:textSize="20sp"
+            android:text="衣橱"/>
+
+        <RadioButton
+            android:id="@+id/rb_items"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:buttonTint="@color/transparent00"
+            android:background="@drawable/radio_button_selector"
+            android:textSize="20sp"
+            android:scaleX="1"
+            android:scaleY="1"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:gravity="center|left"
+            android:textSize="20sp"
+            android:text="物品"/>
+
+    </RadioGroup>
+
+
+    <EditText
+        android:id="@+id/et_name"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="请输入名称"
+        android:inputType="text"
+        android:textSize="20sp"
+        android:singleLine="true"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:orientation="horizontal"
+        >
+
+        <ImageView
+            android:id="@+id/iv_img_show"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            tools:src="@drawable/img_null"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="120dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btn_add_img"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="2dp"
+                android:textAllCaps="false"
+                android:background="@drawable/add_items_button_new_ripple"
+                />
+
+
+            <Button
+                android:id="@+id/btn_crop_img"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="2dp"
+                android:textAllCaps="false"
+                android:background="@drawable/add_items_button_crop_ripple"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/layout_clothes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+
+            <RadioGroup
+                android:id="@+id/rg_type"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:orientation="horizontal"
+                android:layout_margin="5dp"
+                >
+
+                <RadioButton
+                    android:id="@+id/rb_clothing"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
+                    android:buttonTint="@color/transparent00"
+                    android:background="@drawable/radio_button_selector"
+                    android:textSize="20sp"
+                    android:scaleX="1"
+                    android:scaleY="1"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="10dp"
+                    android:gravity="center|left"
+                    android:textSize="20sp"
+                    android:text="衣物"/>
+
+                <RadioButton
+                    android:id="@+id/rb_bedding"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:buttonTint="@color/transparent00"
+                    android:background="@drawable/radio_button_selector"
+                    android:textSize="20sp"
+                    android:scaleX="1"
+                    android:scaleY="1"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="10dp"
+                    android:gravity="center|left"
+                    android:textSize="20sp"
+                    android:text="床具"/>
+
+            </RadioGroup>
+
+
+
+        <LinearLayout
+            android:id="@+id/ll_clothingType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/Pink_1"
+                android:text="分类"
+                android:textSize="20sp"/>
+
+            <Spinner
+                android:id="@+id/sp_clothing_type"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:spinnerMode="dropdown" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/ll_beddingType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="分类"
+                android:textSize="20sp"/>
+
+            <Spinner
+                android:id="@+id/sp_bedding_type"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:spinnerMode="dropdown" />
+
+        </LinearLayout>
+
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/Pink_1"
+            android:text="厚度"
+            android:textSize="20sp"/>
+
+        <Spinner
+            android:id="@+id/sp_clothes_thickness"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:spinnerMode="dropdown"
+            android:visibility="visible"/>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/Pink_1"
+            android:text="季节"
+            android:textSize="20sp"/>
+
+        <Spinner
+            android:id="@+id/sp_clothes_season"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:spinnerMode="dropdown"
+            android:visibility="visible" />
+
+        <EditText
+            android:id="@+id/et_brief"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:hint="请输入简介"
+            android:inputType="text"
+            />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/layout_items"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="分类"
+            android:textSize="20sp"/>
+
+        <Spinner
+            android:id="@+id/sp_items_type"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:spinnerMode="dropdown"
+            android:visibility="visible"/>
+
+
+        <EditText
+            android:id="@+id/et_items_brief"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:hint="请输入简介"
+            android:inputType="text"
+            />
+
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/btn_save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="确定"/>
+    <Button
+        android:id="@+id/btn_exit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="取消"/>
+    <Button
+        android:id="@+id/btn_delete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:visibility="visible"
+        android:text="删库跑路"/>
+    <Button
+        android:id="@+id/btn_test"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:visibility="visible"
+        android:text="测试专用"/>
+
+
+
+</LinearLayout>

@@ -32,6 +32,7 @@ public class ActivityHome extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.activity_anim_1,R.anim.activity_anim_2);
         setContentView(R.layout.activity_home);
 
         home_button = findViewById(R.id.home_button);
@@ -99,10 +100,9 @@ public class ActivityHome extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
-
-
-
-
-
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.activity_anim_3,R.anim.activity_anim_4);
+    }
 }

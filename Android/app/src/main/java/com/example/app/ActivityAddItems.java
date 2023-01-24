@@ -6,6 +6,7 @@ import static com.example.app.util.ToastUtil.show;
 
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -40,15 +41,17 @@ import com.example.app.entity.clothesInfo;
 import com.example.app.entity.itemsInfo;
 import com.example.app.entity.staticData;
 import com.example.app.util.DataService;
+import com.example.app.util.FileUtil;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.DayOfWeek;
 import java.util.Arrays;
 import java.util.Calendar;
-
-
-
+import java.util.Collections;
+import java.util.List;
 
 
 public class ActivityAddItems extends AppCompatActivity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
@@ -86,8 +89,8 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     private final int ALBUM_REQUEST_CODE = 1;
     private final int CROP_REQUEST_CODE = 2;
 
-    private static String path = staticData.EMPTY;
-    private static final Uri mUri = null;
+    private static String namePath = staticData.EMPTY;
+    private static Uri mUri = null;
     private ActivityResultLauncher<Intent> register;
 
     private clothesInfo mClothesInfo;
@@ -170,7 +173,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
 
                 instance.setEditBitmap(bitmap);
                 Intent intent_crop = new Intent(this,ActivityCropper.class);
-                startActivityForResult(intent_crop,CROP_REQUEST_CODE);
+//                startActivityForResult(intent_crop,CROP_REQUEST_CODE);
 
             }
         }
@@ -183,6 +186,9 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
             }
         }
     }
+
+
+
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -197,7 +203,11 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
                 // 保存已裁切图片
                 if (bitmapCropped != null) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        saveImageToGallery(this, bitmapCropped);
+                        namePath = FileUtil.saveImageAndGetName(this,bitmapCropped);
+                    }
+                } else if (bitmap != null) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        namePath = FileUtil.saveImageAndGetName(this,bitmap);
                     }
                 }
 
@@ -213,7 +223,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
                     mClothesInfo.thickness = sp_clothes_thickness.getSelectedItemPosition();
                     mClothesInfo.season = sp_clothes_season.getSelectedItemPosition();
                     mClothesInfo.brief = et_brief.getText().toString();
-                    mClothesInfo.imgPath = path;
+                    mClothesInfo.imgPath = namePath;
                     mClothesInfo.status = IN_STORE;
 
                     // 向clothes数据库插入项
@@ -223,7 +233,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
                     mItemsInfo.name = et_name.getText().toString();
                     mItemsInfo.type = sp_items_type.getSelectedItemPosition();
                     mItemsInfo.brief = et_items_brief.getText().toString();
-                    mItemsInfo.imgPath = path;
+                    mItemsInfo.imgPath = namePath;
                     mItemsInfo.status = IN_STORE;
 
                     // 向clothes数据库插入项
@@ -242,8 +252,6 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
                 break;
 
             case R.id.btn_test:
-                String filePath = Arrays.toString(getExternalFilesDirs(DIRECTORY_PICTURES));
-                Log.d("HH","btn_getPath : " + filePath );
 
                 break;
 
@@ -317,6 +325,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         @SuppressLint("InflateParams") View contentView = LayoutInflater.from(this).inflate(R.layout.popupwindow_add_img,null);
         mPopWindow = new PopupWindow(contentView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT,true);
         mPopWindow.setContentView(contentView);
+
 
         TextView pop_btn_catch = contentView.findViewById(R.id.pop_btn_catch);
         TextView pop_btn_album = contentView.findViewById(R.id.pop_btn_album);
@@ -433,6 +442,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
 
 
 
+
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public static void saveImageToGallery(Context context, Bitmap image){
 
@@ -452,12 +462,6 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         ContentResolver resolver = context.getContentResolver();
 
         final Uri uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
-
-
-        String croppedPath = getRealFilePath(context,uri);
-
-        Log.d("HH", croppedPath);
 
         try {
             // First, write the actual data for our screenshot
@@ -479,11 +483,10 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
             e.printStackTrace();
         } finally {
             //将保存的uri转存为String，保存为path
-            path = croppedPath;
+            namePath = mImageFileName;
         }
 
     }
-
 
 
 
@@ -520,5 +523,38 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
 
 
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    private static void findImageByName(Context context, String name) {
+
+        Uri externalContentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        String selection = MediaStore.Images.Media.DISPLAY_NAME + " = ?";
+
+        @SuppressLint("Recycle") Cursor cursor = context.getContentResolver().query(externalContentUri,null,selection,new String[]{name},null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+
+            // 获取 _id 所在列的索引
+            long id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID));
+
+            // 获取 relative_path 所在列的索引
+            String relativePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.RELATIVE_PATH));
+
+            // 获取 _display_name 所在列的索引
+            String displayName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME));
+
+            // 绝对路径
+            String absolutePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
+
+            // 通过 _id 字段获取图片 Uri
+            Uri uri = ContentUris.withAppendedId(externalContentUri, id);
+
+            Log.i("HH", "查询到的 Uri = " + uri + " , 路径 = " + absolutePath);
+
+            // 关闭游标
+            cursor.close();
+
+        }
+
+    }
 
 }

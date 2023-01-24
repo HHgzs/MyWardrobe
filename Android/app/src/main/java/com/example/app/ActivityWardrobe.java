@@ -31,6 +31,7 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.activity_anim_1,R.anim.activity_anim_2);
         setContentView(R.layout.activity_wardrobe);
 
         home_button = findViewById(R.id.home_button);
@@ -98,4 +99,12 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
         ToastUtil.show(this, "条目被长按了，" + clothesInfoList.get(position).name);
         return false;
     }
+
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.activity_anim_3,R.anim.activity_anim_4);
+    }
+
 }

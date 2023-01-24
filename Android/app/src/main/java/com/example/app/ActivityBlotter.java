@@ -16,6 +16,7 @@ public class ActivityBlotter extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.activity_anim_1,R.anim.activity_anim_2);
         setContentView(R.layout.activity_blotter);
 
         home_button = findViewById(R.id.home_button);
@@ -49,5 +50,12 @@ public class ActivityBlotter extends AppCompatActivity implements View.OnClickLi
         home_button.setActivated(false);
         wardrobe_button.setActivated(false);
         blotter_button.setActivated(true);
+    }
+
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.activity_anim_3,R.anim.activity_anim_4);
     }
 }

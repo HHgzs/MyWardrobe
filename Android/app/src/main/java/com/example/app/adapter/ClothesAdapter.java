@@ -1,5 +1,6 @@
 package com.example.app.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -12,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.app.ActivityWardrobe;
+import com.example.app.MyApplication;
 import com.example.app.R;
 import com.example.app.entity.clothesInfo;
 import com.example.app.entity.staticData;
@@ -23,8 +26,8 @@ import java.util.Objects;
 
 public class ClothesAdapter extends BaseAdapter {
 
-    private Context mContext;
-    private List<clothesInfo> mClothesInfoList;
+    private final Context mContext;
+    private final List<clothesInfo> mClothesInfoList;
 
 
 
@@ -50,6 +53,7 @@ public class ClothesAdapter extends BaseAdapter {
         return position;
     }
 
+    @SuppressLint("InflateParams")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
@@ -77,12 +81,13 @@ public class ClothesAdapter extends BaseAdapter {
         holder.ll_list_clothes.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
 
         if (!Objects.equals(clothesInfo.imgPath, staticData.EMPTY)) {
-            Bitmap bitmap = null;
-            // 根据imgPath读取图像为Bitmap或uri并显示出来
-            String path = clothesInfo.imgPath;
-            bitmap = FileUtil.openImage(path);
-            holder.iv_list_clothes_img.setImageBitmap(bitmap);
 
+            // 根据imgPath读取图像为uri并显示出来
+            String name = clothesInfo.imgPath;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                Uri uri = FileUtil.findImageByName(MyApplication.getContext(),name);
+                holder.iv_list_clothes_img.setImageURI(uri);
+            }
 
         } else {
             holder.iv_list_clothes_img.setImageResource(R.drawable.img_null);
@@ -97,12 +102,13 @@ public class ClothesAdapter extends BaseAdapter {
         return convertView;
     }
 
-    public final class ViewHolder {
+    public static final class ViewHolder {
         public LinearLayout ll_list_clothes;
         public ImageView iv_list_clothes_img;
         public TextView tv_list_clothes_name;
         public TextView tv_list_clothes_desc;
         public Button btn_edit;
     }
+
 
 }

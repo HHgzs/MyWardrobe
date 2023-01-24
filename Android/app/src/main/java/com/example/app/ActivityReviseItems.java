@@ -1,56 +1,44 @@
 package com.example.app;
 
-        import static android.os.Environment.DIRECTORY_PICTURES;
-        import static com.example.app.util.ToastUtil.show;
+import static com.example.app.util.ToastUtil.show;
 
-        import androidx.activity.result.ActivityResultLauncher;
-        import androidx.appcompat.app.AppCompatActivity;
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
+import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.appcompat.app.AppCompatActivity;
 
-        import android.content.ContentResolver;
-        import android.content.ContentValues;
-        import android.content.Context;
-        import android.content.Intent;
-        import android.graphics.Bitmap;
-        import android.net.Uri;
-        import android.os.Build;
-        import android.os.Bundle;
-        import android.provider.MediaStore;
-        import android.text.format.DateUtils;
-        import android.util.Log;
-        import android.view.Gravity;
-        import android.view.LayoutInflater;
-        import android.view.View;
-        import android.widget.AdapterView;
-        import android.widget.ArrayAdapter;
-        import android.widget.Button;
-        import android.widget.EditText;
-        import android.widget.ImageView;
-        import android.widget.LinearLayout;
-        import android.widget.PopupWindow;
-        import android.widget.RadioButton;
-        import android.widget.RadioGroup;
-        import android.widget.Spinner;
-        import android.widget.TextView;
+import com.example.app.database.ItemsDBHelper;
+import com.example.app.entity.clothesInfo;
+import com.example.app.entity.itemsInfo;
+import com.example.app.entity.staticData;
+import com.example.app.util.DataService;
+import com.example.app.util.FileUtil;
 
-        import com.example.app.database.ItemsDBHelper;
-        import com.example.app.entity.clothesInfo;
-        import com.example.app.entity.itemsInfo;
-        import com.example.app.entity.staticData;
-        import com.example.app.util.DataService;
-
-
-
-        import java.io.File;
-        import java.io.IOException;
-        import java.io.OutputStream;
-        import java.util.Calendar;
-
+import java.util.Objects;
 
 
 public class ActivityReviseItems extends AppCompatActivity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
 
-    private RadioGroup rg_clothes;
     private RadioButton rb_clothing;
     private RadioButton rb_bedding;
     private LinearLayout layout_items;
@@ -78,11 +66,11 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
     private int id;
 
     // 此处为spinner下拉菜单的适配器数组
-    private static String[] clothingTypeArray = staticData.clothingTypeArray;
-    private static String[] beddingTypeArray = staticData.beddingTypeArray;
-    private static String[] itemsTypeArray = staticData.itemsTypeArray;
-    private static String[] thicknessArray = staticData.thicknessArray;
-    private static String[] seasonArray = staticData.seasonArray;
+    private static final String[] clothingTypeArray = staticData.clothingTypeArray;
+    private static final String[] beddingTypeArray = staticData.beddingTypeArray;
+    private static final String[] itemsTypeArray = staticData.itemsTypeArray;
+    private static final String[] thicknessArray = staticData.thicknessArray;
+    private static final String[] seasonArray = staticData.seasonArray;
 
 
     private final int ALBUM_REQUEST_CODE = 1;
@@ -90,7 +78,7 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
     private final int OUT_STORE = 0;
     private final int IN_STORE = 1;
 
-    private static String path = staticData.EMPTY;
+    private static String namePath = staticData.EMPTY;
     private static Uri mUri;
     private ActivityResultLauncher<Intent> registerC;
 
@@ -107,7 +95,7 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
         setContentView(R.layout.activity_revise_items);
 
 
-        rg_clothes = findViewById(R.id.rg_type);
+        RadioGroup rg_clothes = findViewById(R.id.rg_type);
         rg_clothes.setOnCheckedChangeListener(this);
         rb_clothing = findViewById(R.id.rb_clothing);
         rb_bedding = findViewById(R.id.rb_bedding);
@@ -176,7 +164,7 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
                 iv_img_show.setImageBitmap(bitmap);
                 instance.setEditBitmap(bitmap);
                 Intent intent_crop = new Intent(this,ActivityCropper.class);
-                startActivityForResult(intent_crop,CROP_REQUEST_CODE);
+//                startActivityForResult(intent_crop,CROP_REQUEST_CODE);
 
             }
         }
@@ -190,6 +178,7 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
         }
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -201,7 +190,13 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
 
                 // 保存已裁切图片
                 if (bitmapCropped != null) {
-                    saveImageToGallery(this, bitmapCropped);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        namePath = FileUtil.saveImageAndGetName(this,bitmapCropped);
+                    }
+                } else if (bitmap != null) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        namePath = FileUtil.saveImageAndGetName(this,bitmap);
+                    }
                 }
 
 
@@ -216,8 +211,8 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
                     mClothesInfo.thickness = sp_clothes_thickness.getSelectedItemPosition();
                     mClothesInfo.season = sp_clothes_season.getSelectedItemPosition();
                     mClothesInfo.brief = et_brief.getText().toString();
-                    mClothesInfo.imgPath = path;
                     mClothesInfo.status = IN_STORE;
+                    mClothesInfo.imgPath = namePath;
 
                     // 向clothes数据库插入项
                     mDBHelper.insertClothesInfo(mClothesInfo);
@@ -226,8 +221,8 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
                     mItemsInfo.name = et_name.getText().toString();
                     mItemsInfo.type = sp_items_type.getSelectedItemPosition();
                     mItemsInfo.brief = et_items_brief.getText().toString();
-                    mItemsInfo.imgPath = path;
                     mItemsInfo.status = IN_STORE;
+                    mClothesInfo.imgPath = namePath;
 
                     // 向clothes数据库插入项
                     mDBHelper.insertItemsInfo(mItemsInfo);
@@ -273,6 +268,7 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
 
 
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
         switch (checkedId) {
@@ -294,7 +290,7 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
 
     // 显示下方弹出列表
     private void showPopupWindow() {
-        View contentView = LayoutInflater.from(this).inflate(R.layout.popupwindow_add_img,null);
+        @SuppressLint("InflateParams") View contentView = LayoutInflater.from(this).inflate(R.layout.popupwindow_add_img,null);
         mPopWindow = new PopupWindow(contentView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT,true);
         mPopWindow.setContentView(contentView);
 
@@ -302,7 +298,7 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
         TextView pop_btn_album = (TextView) contentView.findViewById(R.id.pop_btn_album);
         pop_btn_catch.setOnClickListener(this);
         pop_btn_album.setOnClickListener(this);
-        View rootView = LayoutInflater.from(this).inflate(R.layout.activity_add_items,null);
+        @SuppressLint("InflateParams") View rootView = LayoutInflater.from(this).inflate(R.layout.activity_add_items,null);
         mPopWindow.showAtLocation(rootView, Gravity.BOTTOM,0,0);
 
 
@@ -356,82 +352,6 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
         mDBHelper.closeLink();
     }
 
-    private static String getTime() {
-        String str;
-        Calendar selectedDate = Calendar.getInstance();
-
-        int year = selectedDate.get(Calendar.YEAR);
-        int month = selectedDate.get(Calendar.MONTH) + 1;
-        int day = selectedDate.get(Calendar.DAY_OF_MONTH);
-        int hour = selectedDate.get(Calendar.HOUR);
-        int minute = selectedDate.get(Calendar.MINUTE);
-        int second = selectedDate.get(Calendar.SECOND);
-
-        str = String.valueOf(year);
-        if(month < 10) { str += "0"; }
-        str += String.valueOf(month);
-        if(day < 10) { str += "0"; }
-        str += String.valueOf(day);
-        /* str += "_"; */
-        if(hour < 10) { str += "0"; }
-        str += String.valueOf(hour);
-        if(minute < 10) { str += "0"; }
-        str += String.valueOf(minute);
-        if(second < 10) { str += "0"; }
-        str += String.valueOf(second);
-        return str;
-    }
-
-
-
-    public static void saveImageToGallery(Context context, Bitmap image){
-
-
-        long mImageTime = System.currentTimeMillis();
-        String imageDate = getTime();
-        String PICTURE_SAVE_NAME_TEMPLATE = "img_%s.png";
-        String mImageFileName = String.format(PICTURE_SAVE_NAME_TEMPLATE, imageDate);
-
-        final ContentValues values = new ContentValues();
-        values.put(MediaStore.MediaColumns.RELATIVE_PATH, DIRECTORY_PICTURES + File.separator + "MyWardrobe");
-        values.put(MediaStore.MediaColumns.DISPLAY_NAME, mImageFileName);
-        values.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
-        values.put(MediaStore.MediaColumns.DATE_ADDED, mImageTime / 1000);
-        values.put(MediaStore.MediaColumns.DATE_MODIFIED, mImageTime / 1000);
-        values.put(MediaStore.MediaColumns.DATE_EXPIRES, (mImageTime + DateUtils.DAY_IN_MILLIS) / 1000);
-        values.put(MediaStore.MediaColumns.IS_PENDING, 1);
-        ContentResolver resolver = context.getContentResolver();
-
-        final Uri uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
-        // uri提取，保存到静态
-        Log.d("HH", String.valueOf(uri));
-        mUri = uri;
-
-        try {
-            // First, write the actual data for our screenshot
-            try (OutputStream out = resolver.openOutputStream(uri)) {
-                if (!image.compress(Bitmap.CompressFormat.PNG, 100, out)) {
-                    throw new IOException("Failed to compress");
-                }
-            }
-            // Everything went well above, publish it!
-            values.clear();
-            values.put(MediaStore.MediaColumns.IS_PENDING, 0);
-            values.putNull(MediaStore.MediaColumns.DATE_EXPIRES);
-            resolver.update(uri, values, null, null);
-
-        } catch (IOException e){
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                resolver.delete(uri, null);
-            }
-            e.printStackTrace();
-        } finally {
-            //将保存的uri转存为String，保存为path
-            path = String.valueOf(mUri);
-        }
-
-    }
 
     // 根据上级Activity设置类型clothes或items,以及对象的基本数据
     private void setType() {
@@ -440,10 +360,21 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
             layout_items.setVisibility(View.GONE);
             mClothesInfo =  mDBHelper.queryClothesInfoByID(id);
             clothes = mClothesInfo.basicType;
-
             et_name.setText(mClothesInfo.name);
-            path = mClothesInfo.imgPath;
-            iv_img_show.setImageURI(Uri.parse(path));
+
+            if (!Objects.equals(mClothesInfo.imgPath, staticData.EMPTY)) {
+
+                // 根据imgPath读取图像为uri并显示出来
+                String name = mClothesInfo.imgPath;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    Uri uri = FileUtil.findImageByName(MyApplication.getContext(),name);
+                    iv_img_show.setImageURI(uri);
+                }
+
+            } else {
+                iv_img_show.setImageResource(R.drawable.img_null);
+            }
+
             et_brief.setText(mClothesInfo.brief);
 
 
@@ -452,11 +383,19 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
             layout_items.setVisibility(View.VISIBLE);
             mItemsInfo = mDBHelper.queryItemsInfoByID(id);
             et_name.setText(mItemsInfo.name);
-            path = mItemsInfo.imgPath;
-            iv_img_show.setImageURI(Uri.parse(path));
+
+            if (!Objects.equals(mClothesInfo.imgPath, staticData.EMPTY)) {
+
+                // 根据imgPath读取图像为uri并显示出来
+                String name = mClothesInfo.imgPath;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    Uri uri = FileUtil.findImageByName(MyApplication.getContext(),name);
+                    iv_img_show.setImageURI(uri);
+                }
+            } else {
+                iv_img_show.setImageResource(R.drawable.img_null);
+            }
         }
-
-
     }
 
     // 根据setType设置的基本数据，初始化基本信息，将原数据展示出来
@@ -477,17 +416,10 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
             sp_clothes_season.setSelection(mClothesInfo.season);
             et_brief.setText(mClothesInfo.brief);
 
-
         } else if (mItems == 1) {
             sp_items_type.setSelection(mItemsInfo.type);
             et_items_brief.setText(mItemsInfo.brief);
 
         }
-
-
-
-
-
     }
-
 }
