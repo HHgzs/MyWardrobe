@@ -46,6 +46,7 @@ import com.example.app.entity.itemsInfo;
 import com.example.app.entity.staticData;
 import com.example.app.util.DataService;
 import com.example.app.util.FileUtil;
+import com.example.app.util.pixUtil;
 
 import java.io.File;
 import java.io.FileReader;
@@ -73,6 +74,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     private EditText et_name;
     private EditText et_brief;
     private EditText et_items_brief;
+    private EditText et_items_num;
     private ImageView iv_img_show;
     private ImageView btn_add_img;
     private ImageView btn_crop_img;
@@ -135,9 +137,11 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         et_name = findViewById(R.id.et_name);
         et_brief = findViewById(R.id.et_brief);
         et_items_brief = findViewById(R.id.et_items_brief);
+        et_items_num = findViewById(R.id.et_items_num);
         iv_img_show = findViewById(R.id.iv_img_show);
         iv_img_show.setImageResource(R.drawable.img_null);
         iv_img_show.setOnClickListener(this);
+
 
         // 为图片添加按钮设置点击事件监听，弹出拍照或从相册选择按钮
         btn_add_img = findViewById(R.id.btn_add_img);
@@ -266,7 +270,11 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
                     mItemsInfo.type = sp_items_type.getSelectedItemPosition();
                     mItemsInfo.brief = et_items_brief.getText().toString();
                     mItemsInfo.imgPath = namePath;
-                    mItemsInfo.status = IN_STORE;
+                    if (Integer.parseInt(et_items_num.getText().toString()) >= 0) {
+                        mItemsInfo.status = Integer.parseInt(et_items_num.getText().toString());
+                    } else {
+                        mItemsInfo.status = staticData.IN_STORE;
+                    }
 
                     // 向clothes数据库插入项
                     mDBHelper.insertItemsInfo(mItemsInfo);
@@ -308,6 +316,25 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
                 intent_album.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
                 startActivityForResult(intent_album, ALBUM_REQUEST_CODE);
                 mPopWindow.dismiss();
+                break;
+
+            case R.id.iv_img_show:
+                DataService instance_2 = DataService.getInstance();
+                Intent intent = new Intent(this,ActivityShowPicture.class);
+
+                if (bitmapCropped != null) {
+                    instance_2.setEditBitmap(bitmapCropped);
+                    startActivity(intent);
+
+                } else if (bitmap != null) {
+                    instance_2.setEditBitmap(bitmap);
+                    startActivity(intent);
+
+                } else {
+                    Intent intent_album_2 = new Intent(Intent.ACTION_PICK, null);
+                    intent_album_2.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+                    startActivityForResult(intent_album_2, ALBUM_REQUEST_CODE);
+                }
                 break;
 
         }
@@ -354,8 +381,11 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
 
     // 显示下方弹出列表
     private void showPopupWindow() {
+
+        int height = pixUtil.dip2px(this, 150);
+
         @SuppressLint("InflateParams") View contentView = LayoutInflater.from(this).inflate(R.layout.popupwindow_add_img,null);
-        mPopWindow = new PopupWindow(contentView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT,true);
+        mPopWindow = new PopupWindow(contentView, LinearLayout.LayoutParams.MATCH_PARENT, height,true);
         mPopWindow.setContentView(contentView);
 
 

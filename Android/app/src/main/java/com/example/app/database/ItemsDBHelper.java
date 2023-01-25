@@ -199,6 +199,7 @@ public class ItemsDBHelper extends SQLiteOpenHelper {
         itemsInfo info = null;
         Cursor cursor = mReadDB.query(TABLE_ITEMS_INFO,null,"_id=?",new String[]{String.valueOf(itemsID)},null,null,null);
         if (cursor.moveToNext()) {
+            info = new itemsInfo();
             info.id = cursor.getInt(0);
             info.name = cursor.getString(1);
             info.type = cursor.getInt(2);

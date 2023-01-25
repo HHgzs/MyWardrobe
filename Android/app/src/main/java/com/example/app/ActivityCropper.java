@@ -1,32 +1,25 @@
 package com.example.app;
 
-import static android.os.Environment.DIRECTORY_DCIM;
 import static com.example.app.util.ToastUtil.show;
 
 import android.annotation.SuppressLint;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
 
 import com.example.app.util.DataService;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 public class ActivityCropper extends AppCompatActivity implements View.OnClickListener{
 

@@ -53,15 +53,17 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
     private EditText et_name;
     private EditText et_brief;
     private EditText et_items_brief;
+    private EditText et_items_num;
     private ImageView iv_img_show;
     private ImageView btn_add_img;
     private ImageView btn_crop_img;
+    private TextView tv_revise_title;
 
     // 物品首选分类分成衣橱内物品和其他物品，衣橱内用 0 表示，其他用 1 表示
     // clothing代表衣物，bedding代表床单被褥，clothes是上述两者总称呼
     // clothing用 0 表示，bedding用 1 表示
-    private int mItems = 0;
-    private int clothes = 0;
+    private int mItems;
+    private int clothes = staticData.TYPE_CLOTHING;
     // 传入id，作为保存依据
     private int id;
 
@@ -83,13 +85,13 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
     private ItemsDBHelper mDBHelper;
     private Bitmap bitmap = null;
     private Bitmap bitmapCropped = null;
+    private Uri uri;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_revise_items_2);
-
 
         RadioGroup rg_clothes = findViewById(R.id.rg_type);
         rg_clothes.setOnCheckedChangeListener(this);
@@ -110,8 +112,9 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
         et_name = findViewById(R.id.et_name);
         et_brief = findViewById(R.id.et_brief);
         et_items_brief = findViewById(R.id.et_items_brief);
+        et_items_num = findViewById(R.id.et_items_num);
         iv_img_show = findViewById(R.id.iv_img_show);
-
+        tv_revise_title = findViewById(R.id.tv_revise_title);
 
         // 为图片添加按钮设置点击事件监听，弹出拍照或从相册选择按钮
         btn_add_img = findViewById(R.id.btn_add_img);
@@ -119,6 +122,7 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
 
         btn_crop_img = findViewById(R.id.btn_crop_img);
         btn_crop_img.setOnClickListener(this);
+        iv_img_show.setOnClickListener(this);
 
         findViewById(R.id.btn_save).setOnClickListener(this);
         findViewById(R.id.btn_exit).setOnClickListener(this);
@@ -136,8 +140,7 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
         // 初始化下拉列表
         initSpinner();
         // 初始化数据
-        setData();
-
+//        setData();
 
     }
 
@@ -198,10 +201,13 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
 
 
                 if (mItems == 0) {
+
                     mClothesInfo.name = et_name.getText().toString();
                     mClothesInfo.basicType = clothes;
+
                     if (clothes == 0) {
                         mClothesInfo.secondType = sp_clothing_type.getSelectedItemPosition();
+
                     } else if (clothes == 1) {
                         mClothesInfo.secondType = sp_bedding_type.getSelectedItemPosition();
                     }
@@ -214,12 +220,19 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
                     // 向clothes数据库插入项
                     mDBHelper.reviseClothesInfo(mClothesInfo);
 
-                } else if (mItems == 1) {
+                } else if (mItems == staticData.TYPE_ITEMS) {
+
                     mItemsInfo.name = et_name.getText().toString();
                     mItemsInfo.type = sp_items_type.getSelectedItemPosition();
                     mItemsInfo.brief = et_items_brief.getText().toString();
-                    mItemsInfo.status = staticData.IN_STORE;
-                    mClothesInfo.imgPath = namePath;
+                    mItemsInfo.imgPath = namePath;
+
+                    if (Integer.parseInt(et_items_num.getText().toString()) >= 0) {
+                        mItemsInfo.status = Integer.parseInt(et_items_num.getText().toString());
+
+                    } else {
+                        mItemsInfo.status = staticData.IN_STORE;
+                    }
 
                     // 向clothes数据库插入项
                     mDBHelper.reviseItemsInfo(mItemsInfo);
@@ -254,6 +267,25 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
                 intent_album.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
                 startActivityForResult(intent_album, ALBUM_REQUEST_CODE);
                 mPopWindow.dismiss();
+                break;
+
+            case R.id.iv_img_show:
+                DataService instance_2 = DataService.getInstance();
+                Intent intent = new Intent(this,ActivityShowPicture.class);
+
+                if (bitmapCropped != null) {
+                    instance_2.setEditBitmap(bitmapCropped);
+                    startActivity(intent);
+
+                } else if (bitmap != null) {
+                    instance_2.setEditBitmap(bitmap);
+                    startActivity(intent);
+
+                } else {
+                    Intent intent_album_2 = new Intent(Intent.ACTION_PICK, null);
+                    intent_album_2.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+                    startActivityForResult(intent_album_2, ALBUM_REQUEST_CODE);
+                }
                 break;
 
         }
@@ -347,44 +379,70 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
     }
 
 
-    // 根据上级Activity设置类型clothes或items,以及对象的基本数据
+    // 根据上级Activity设置类型clothes或items,以及对象的基本数据，文字信息
     private void setType() {
-        if (mItems == 0) {
+        if (mItems == staticData.TYPE_CLOTHES) {
+
+            tv_revise_title.setText("衣物信息");
+
             layout_clothes.setVisibility(View.VISIBLE);
             layout_items.setVisibility(View.GONE);
+
             mClothesInfo =  mDBHelper.queryClothesInfoByID(id);
+
             clothes = mClothesInfo.basicType;
-            et_name.setText(mClothesInfo.name);
             namePath = mClothesInfo.imgPath;
+
+            et_name.setText(mClothesInfo.name);
+            et_brief.setText(mClothesInfo.brief);
 
             if (!Objects.equals(mClothesInfo.imgPath, staticData.EMPTY)) {
 
                 // 根据imgPath读取图像为uri并显示出来
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                    Uri uri = FileUtil.findImageByName(MyApplication.getContext(),namePath);
+
+                    uri = FileUtil.findImageByName(MyApplication.getContext(),namePath);
                     iv_img_show.setImageURI(uri);
+
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
 
             } else {
                 iv_img_show.setImageResource(R.drawable.img_null);
             }
 
-            et_brief.setText(mClothesInfo.brief);
 
 
-        } else if (mItems == 1) {
+        } else if (mItems == staticData.TYPE_ITEMS) {
+
+            tv_revise_title.setText("物品信息");
+
             layout_clothes.setVisibility(View.GONE);
             layout_items.setVisibility(View.VISIBLE);
-            mItemsInfo = mDBHelper.queryItemsInfoByID(id);
-            et_name.setText(mItemsInfo.name);
-            namePath = mClothesInfo.imgPath;
 
-            if (!Objects.equals(mClothesInfo.imgPath, staticData.EMPTY)) {
+            mItemsInfo = mDBHelper.queryItemsInfoByID(id);
+            namePath = mItemsInfo.imgPath;
+
+            et_name.setText(mItemsInfo.name);
+            et_items_brief.setText(mItemsInfo.brief);
+            et_items_num.setText(String.valueOf(mItemsInfo.status));
+
+            if (!Objects.equals(mItemsInfo.imgPath, staticData.EMPTY)) {
 
                 // 根据imgPath读取图像为uri并显示出来
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                    Uri uri = FileUtil.findImageByName(MyApplication.getContext(),namePath);
+
+                    uri = FileUtil.findImageByName(MyApplication.getContext(),namePath);
                     iv_img_show.setImageURI(uri);
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             } else {
                 iv_img_show.setImageResource(R.drawable.img_null);
@@ -392,15 +450,17 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
         }
     }
 
-    // 根据setType设置的基本数据，初始化基本信息，将原数据展示出来
+    // 根据setType中，由basicType设置的clothes，初始化下拉列表和单选按钮等信息
     private void setData() {
-        if (mItems == 0) {
-            if (clothes == 0) {
+        if (mItems == staticData.TYPE_CLOTHES) {
+            if (clothes == staticData.TYPE_CLOTHING) {
+
                 rb_clothing.setChecked(true);
                 rb_bedding.setChecked(false);
                 sp_clothing_type.setSelection(mClothesInfo.secondType);
 
-            } else if (clothes == 1) {
+            } else if (clothes == staticData.TYPE_BEDDING) {
+
                 rb_clothing.setChecked(false);
                 rb_bedding.setChecked(true);
                 sp_bedding_type.setSelection(mClothesInfo.secondType);
@@ -410,10 +470,9 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
             sp_clothes_season.setSelection(mClothesInfo.season);
             et_brief.setText(mClothesInfo.brief);
 
-        } else if (mItems == 1) {
-            sp_items_type.setSelection(mItemsInfo.type);
-            et_items_brief.setText(mItemsInfo.brief);
+        } else if (mItems == staticData.TYPE_ITEMS) {
 
+            sp_items_type.setSelection(mItemsInfo.type);
         }
     }
 }

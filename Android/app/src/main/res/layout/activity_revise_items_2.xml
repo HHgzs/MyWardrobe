@@ -13,6 +13,7 @@
     android:paddingBottom="20dp">
 
     <TextView
+        android:id="@+id/tv_revise_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="衣物信息"
@@ -88,7 +89,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <RadioGroup
             android:id="@+id/rg_type"
@@ -238,7 +239,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="visible">
 
 
         <TextView
@@ -255,6 +256,31 @@
             android:spinnerMode="dropdown"
             android:visibility="visible"/>
 
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/Pink_1"
+            android:text="数量"
+            android:textSize="20sp"/>
+
+        <EditText
+            android:id="@+id/et_items_num"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:hint="请输入数量"
+            android:inputType="number"
+            android:singleLine="true"
+            android:theme="@style/MyEditTextStyle"
+            />
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/Pink_1"
+            android:text="简介"
+            android:textSize="20sp"/>
 
         <EditText
             android:id="@+id/et_items_brief"

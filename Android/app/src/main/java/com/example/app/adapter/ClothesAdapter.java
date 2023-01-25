@@ -2,7 +2,6 @@ package com.example.app.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,14 +12,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.app.ActivityWardrobe;
 import com.example.app.MyApplication;
 import com.example.app.R;
 import com.example.app.database.ItemsDBHelper;
 import com.example.app.entity.clothesInfo;
 import com.example.app.entity.staticData;
 import com.example.app.util.FileUtil;
-import com.example.app.util.ToastUtil;
 
 import java.util.List;
 import java.util.Objects;
@@ -89,7 +86,6 @@ public class ClothesAdapter extends BaseAdapter {
                 Uri uri = FileUtil.findImageByName(MyApplication.getContext(),name);
                 holder.iv_list_clothes_img.setImageURI(uri);
             }
-
         } else {
             holder.iv_list_clothes_img.setImageResource(R.drawable.img_null_bk);
 
@@ -98,21 +94,25 @@ public class ClothesAdapter extends BaseAdapter {
         holder.tv_list_clothes_name.setText(clothesInfo.name);
         holder.tv_list_clothes_desc.setText(clothesInfo.brief);
 
-        if (clothesInfo.status > 0) {
+        if (clothesInfo.status >= staticData.IN_STORE) {
             holder.btn_edit.setText("在库");
             holder.btn_edit.setTextColor(0xffffffff);
-        } else if (clothesInfo.status == 0) {
+
+        } else if (clothesInfo.status == staticData.OUT_STORE) {
             holder.btn_edit.setText("离库");
             holder.btn_edit.setTextColor(0xffFF8E8E);
         }
 
         holder.btn_edit.setOnClickListener(v -> {
-            if (clothesInfo.status == 0) {
-                clothesInfo.status = 1;
+            if (clothesInfo.status == staticData.OUT_STORE) {
+
+                clothesInfo.status = staticData.IN_STORE;
                 holder.btn_edit.setText("在库");
                 holder.btn_edit.setTextColor(0xffffffff);
-            } else if (clothesInfo.status > 0) {
-                clothesInfo.status = 0;
+
+            } else if (clothesInfo.status >= staticData.IN_STORE) {
+
+                clothesInfo.status = staticData.OUT_STORE;
                 holder.btn_edit.setText("离库");
                 holder.btn_edit.setTextColor(0xffFF8E8E);
             }
@@ -128,7 +128,6 @@ public class ClothesAdapter extends BaseAdapter {
     public static final class ViewHolder {
         public LinearLayout ll_list_clothes;
         public ImageView iv_list_clothes_img;
-        public ImageView iv_cover_image;
         public TextView tv_list_clothes_name;
         public TextView tv_list_clothes_desc;
         public Button btn_edit;
