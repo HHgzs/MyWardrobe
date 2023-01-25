@@ -4,59 +4,84 @@
     android:id="@+id/ll_list_clothes"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:background="@color/background">
 
-    <ImageView
-        android:id="@+id/iv_list_clothes_img"
-        android:layout_width="0dp"
-        android:layout_height="80dp"
-        android:layout_weight="1"
-        android:layout_margin="5dp"
-        android:scaleType="fitCenter"
-        tools:src="@drawable/img_null"
-        />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="5dp"
-        android:layout_weight="3"
-        android:orientation="vertical">
 
-        <!-- 这是显示名称的文本视图 -->
-        <TextView
-            android:id="@+id/tv_list_clothes_name"
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_marginTop="8dp"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="start|center"
-            android:textColor="@color/Pink_1"
-            android:textSize="20sp"
-            tools:text="衣服" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-        <!-- 这是显示描述的文本视图 -->
-        <TextView
-            android:id="@+id/tv_list_clothes_desc"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2"
-            android:gravity="start|center"
-            android:textColor="@color/black"
-            android:textSize="13sp"
-            tools:text="这里是简介" />
-    </LinearLayout>
 
-    <Button
-        android:id="@+id/btn_edit"
-        android:layout_margin="10dp"
-        android:layout_gravity="center"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:gravity="center"
-        android:background="@drawable/button_pink_ripple"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:text="编辑" />
+            <ImageView
+                android:id="@+id/iv_list_clothes_img"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:layout_margin="5dp"
+                android:scaleType="fitCenter"
+                tools:src="@drawable/img_null_bk"
+                />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="3"
+                android:orientation="vertical">
+
+                <!-- 这是显示名称的文本视图 -->
+                <TextView
+                    android:id="@+id/tv_list_clothes_name"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="start|center"
+                    android:textColor="@color/Pink_1"
+                    android:textSize="20sp"
+                    tools:text="衣服" />
+
+                <!-- 这是显示描述的文本视图 -->
+                <TextView
+                    android:id="@+id/tv_list_clothes_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"
+                    android:gravity="start|center"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
+                    tools:text="这里是简介" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_edit"
+                android:layout_margin="10dp"
+                android:layout_gravity="center"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:gravity="center"
+                android:background="@drawable/button_pink_ripple"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:text="编辑" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/iv_cover_image"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:src="@drawable/cover_image"
+            android:visibility="visible"/>
+
+    </FrameLayout>
 
 </LinearLayout>

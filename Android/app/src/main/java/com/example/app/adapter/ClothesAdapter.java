@@ -91,7 +91,8 @@ public class ClothesAdapter extends BaseAdapter {
             }
 
         } else {
-            holder.iv_list_clothes_img.setImageResource(R.drawable.img_null);
+            holder.iv_list_clothes_img.setImageResource(R.drawable.img_null_bk);
+
         }
 
         holder.tv_list_clothes_name.setText(clothesInfo.name);
@@ -127,6 +128,7 @@ public class ClothesAdapter extends BaseAdapter {
     public static final class ViewHolder {
         public LinearLayout ll_list_clothes;
         public ImageView iv_list_clothes_img;
+        public ImageView iv_cover_image;
         public TextView tv_list_clothes_name;
         public TextView tv_list_clothes_desc;
         public Button btn_edit;
