@@ -212,8 +212,9 @@ public class ItemsDBHelper extends SQLiteOpenHelper {
 
     public void reviseClothesInfo(clothesInfo info) {
         try {
-            mWriteDB.beginTransaction();
+//            mWriteDB.beginTransaction();
             ContentValues values = new ContentValues();
+            values.put("_id",info.id);
             values.put("name",info.name);
             values.put("basic_type",info.basicType);
             values.put("second_type",info.secondType);
@@ -223,7 +224,7 @@ public class ItemsDBHelper extends SQLiteOpenHelper {
             values.put("img_path",info.imgPath);
             values.put("status",info.status);
             mWriteDB.update(TABLE_CLOTHES_INFO,values,"_id=?",new String[]{String.valueOf(info.id)});
-
+//            mWriteDB.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -232,15 +233,16 @@ public class ItemsDBHelper extends SQLiteOpenHelper {
 
     public void reviseItemsInfo(itemsInfo info) {
         try {
-            mWriteDB.beginTransaction();
+//            mWriteDB.beginTransaction();
             ContentValues values = new ContentValues();
+            values.put("_id",info.id);
             values.put("name",info.name);
             values.put("type",info.type);
             values.put("brief",info.brief);
             values.put("img_path",info.imgPath);
             values.put("status",info.status);
             mWriteDB.update(TABLE_ITEMS_INFO,values,"_id=?",new String[]{String.valueOf(info.id)});
-
+//            mWriteDB.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
         }

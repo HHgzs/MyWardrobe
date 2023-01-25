@@ -1,6 +1,7 @@
 package com.example.app;
 
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -37,6 +38,7 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
 
     private long currentID;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,17 +58,21 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
         mDBHelper = ItemsDBHelper.getInstance(this);
         mDBHelper.openReadLink();
         mDBHelper.openWriteLink();
-        clothesInfoList = mDBHelper.queryAllClothesInfo();
-        ClothesAdapter adapter = new ClothesAdapter(this, clothesInfoList);
-        lv_list_clothes.setAdapter(adapter);
-        lv_list_clothes.setOnItemClickListener(this);
-        lv_list_clothes.setOnItemLongClickListener(this);
 
-
+//        clothesInfoList = mDBHelper.queryAllClothesInfo();
+//        ClothesAdapter adapter = new ClothesAdapter(this, clothesInfoList);
+//        lv_list_clothes.setAdapter(adapter);
+//        lv_list_clothes.setOnItemClickListener(this);
+//        lv_list_clothes.setOnItemLongClickListener(this);
 
 
 
     }
+
+
+
+
+
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -83,12 +89,29 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
                 bl_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(bl_intent);
                 break;
+
             case R.id.pop_btn_delete:
                 mDBHelper.deleteClothesInfo(currentID);
                 mPopWindow.dismiss();
+                refresh();
 
 
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        clothesInfoList = mDBHelper.queryAllClothesInfo();
+        ClothesAdapter adapter = new ClothesAdapter(this, clothesInfoList);
+        lv_list_clothes.setAdapter(adapter);
+        lv_list_clothes.setOnItemClickListener(this);
+        lv_list_clothes.setOnItemLongClickListener(this);
+
+
+
+
     }
 
     public void changePageType() {
@@ -140,5 +163,11 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
 
 
     }
+
+    public void refresh() {
+        onCreate(null);
+    }
+
+
 
 }

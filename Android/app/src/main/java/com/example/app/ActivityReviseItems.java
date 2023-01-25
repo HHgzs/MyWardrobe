@@ -75,8 +75,6 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
 
     private final int ALBUM_REQUEST_CODE = 1;
     private final int CROP_REQUEST_CODE = 2;
-    private final int OUT_STORE = 0;
-    private final int IN_STORE = 1;
 
     private static String namePath = staticData.EMPTY;
 
@@ -210,21 +208,21 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
                     mClothesInfo.thickness = sp_clothes_thickness.getSelectedItemPosition();
                     mClothesInfo.season = sp_clothes_season.getSelectedItemPosition();
                     mClothesInfo.brief = et_brief.getText().toString();
-                    mClothesInfo.status = IN_STORE;
+                    mClothesInfo.status = staticData.IN_STORE;
                     mClothesInfo.imgPath = namePath;
 
                     // 向clothes数据库插入项
-                    mDBHelper.insertClothesInfo(mClothesInfo);
+                    mDBHelper.reviseClothesInfo(mClothesInfo);
 
                 } else if (mItems == 1) {
                     mItemsInfo.name = et_name.getText().toString();
                     mItemsInfo.type = sp_items_type.getSelectedItemPosition();
                     mItemsInfo.brief = et_items_brief.getText().toString();
-                    mItemsInfo.status = IN_STORE;
+                    mItemsInfo.status = staticData.IN_STORE;
                     mClothesInfo.imgPath = namePath;
 
                     // 向clothes数据库插入项
-                    mDBHelper.insertItemsInfo(mItemsInfo);
+                    mDBHelper.reviseItemsInfo(mItemsInfo);
                 }
 
                 finish();
@@ -357,13 +355,13 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
             mClothesInfo =  mDBHelper.queryClothesInfoByID(id);
             clothes = mClothesInfo.basicType;
             et_name.setText(mClothesInfo.name);
+            namePath = mClothesInfo.imgPath;
 
             if (!Objects.equals(mClothesInfo.imgPath, staticData.EMPTY)) {
 
                 // 根据imgPath读取图像为uri并显示出来
-                String name = mClothesInfo.imgPath;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                    Uri uri = FileUtil.findImageByName(MyApplication.getContext(),name);
+                    Uri uri = FileUtil.findImageByName(MyApplication.getContext(),namePath);
                     iv_img_show.setImageURI(uri);
                 }
 
@@ -379,13 +377,13 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
             layout_items.setVisibility(View.VISIBLE);
             mItemsInfo = mDBHelper.queryItemsInfoByID(id);
             et_name.setText(mItemsInfo.name);
+            namePath = mClothesInfo.imgPath;
 
             if (!Objects.equals(mClothesInfo.imgPath, staticData.EMPTY)) {
 
                 // 根据imgPath读取图像为uri并显示出来
-                String name = mClothesInfo.imgPath;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                    Uri uri = FileUtil.findImageByName(MyApplication.getContext(),name);
+                    Uri uri = FileUtil.findImageByName(MyApplication.getContext(),namePath);
                     iv_img_show.setImageURI(uri);
                 }
             } else {

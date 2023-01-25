@@ -34,10 +34,10 @@ public class MainActivity2 extends AppCompatActivity implements View.OnClickList
 //                Log.i("HH","versionName--" + versionName);
 //                Log.i("HH","versionName--" + versionName);
 
-
-                tv_1.setText("Product Model: " + android.os.Build.MODEL + ","
-                        + android.os.Build.VERSION.SDK + ","
-                        + android.os.Build.VERSION.RELEASE);
+                tv_1.setText("Product Model: " +
+                        android.os.Build.MODEL + "," +
+                        android.os.Build.VERSION.SDK + "," +
+                        android.os.Build.VERSION.RELEASE);
 //                tv_2.setText(versionName);
 
 

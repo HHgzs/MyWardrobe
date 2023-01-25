@@ -282,7 +282,7 @@
             android:layout_weight="1"
             android:textSize="22sp"
             android:textColor="@color/white"
-            android:text="确定"/>
+            android:text="修改"/>
 
 
 
