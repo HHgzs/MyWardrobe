@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".ActivityAddItems"
     android:orientation="vertical"
-    android:background="@drawable/add_items_background"
+
     android:paddingTop="40dp"
     android:paddingLeft="40dp"
     android:paddingRight="40dp"

@@ -15,62 +15,12 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="添加物品"
+        android:text="衣物信息"
         android:layout_marginLeft="10dp"
         android:textColor="@color/Pink_1"
         android:textSize="30sp"/>
 
 
-    <RadioGroup
-        android:id="@+id/rg_clothes_or_items"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:orientation="horizontal"
-        android:layout_margin="5dp"
-        >
-
-        <RadioButton
-            android:id="@+id/rb_clothes"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
-            android:buttonTint="@color/transparent00"
-            android:background="@drawable/radio_button_selector"
-            android:textSize="20sp"
-            android:scaleX="1"
-            android:scaleY="1"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginLeft="10dp"
-            android:gravity="center|left"
-            android:textSize="20sp"
-            android:text="衣橱"/>
-
-        <RadioButton
-            android:id="@+id/rb_items"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:buttonTint="@color/transparent00"
-            android:background="@drawable/radio_button_selector"
-            android:textSize="20sp"
-            android:scaleX="1"
-            android:scaleY="1"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginLeft="10dp"
-            android:gravity="center|left"
-            android:textSize="20sp"
-            android:text="物品"/>
-
-    </RadioGroup>
 
 
     <EditText
@@ -132,6 +82,7 @@
     </LinearLayout>
 
 
+
     <LinearLayout
         android:id="@+id/layout_clothes"
         android:layout_width="match_parent"
@@ -139,58 +90,56 @@
         android:orientation="vertical"
         android:visibility="visible">
 
+        <RadioGroup
+            android:id="@+id/rg_type"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            android:layout_margin="5dp"
+            >
 
-            <RadioGroup
-                android:id="@+id/rg_type"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:orientation="horizontal"
-                android:layout_margin="5dp"
-                >
+            <RadioButton
+                android:id="@+id/rb_clothing"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:buttonTint="@color/transparent00"
+                android:background="@drawable/radio_button_selector"
+                android:textSize="20sp"
+                android:scaleX="1"
+                android:scaleY="1"
+                />
 
-                <RadioButton
-                    android:id="@+id/rb_clothing"
-                    android:layout_width="40dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="10dp"
-                    android:buttonTint="@color/transparent00"
-                    android:background="@drawable/radio_button_selector"
-                    android:textSize="20sp"
-                    android:scaleX="1"
-                    android:scaleY="1"
-                    />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:gravity="center|left"
+                android:textSize="20sp"
+                android:text="衣物"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="10dp"
-                    android:gravity="center|left"
-                    android:textSize="20sp"
-                    android:text="衣物"/>
+            <RadioButton
+                android:id="@+id/rb_bedding"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:buttonTint="@color/transparent00"
+                android:background="@drawable/radio_button_selector"
+                android:textSize="20sp"
+                android:scaleX="1"
+                android:scaleY="1"
+                />
 
-                <RadioButton
-                    android:id="@+id/rb_bedding"
-                    android:layout_width="40dp"
-                    android:layout_height="match_parent"
-                    android:buttonTint="@color/transparent00"
-                    android:background="@drawable/radio_button_selector"
-                    android:textSize="20sp"
-                    android:scaleX="1"
-                    android:scaleY="1"
-                    />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:gravity="center|left"
+                android:textSize="20sp"
+                android:text="床具"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="10dp"
-                    android:gravity="center|left"
-                    android:textSize="20sp"
-                    android:text="床具"/>
-
-            </RadioGroup>
-
+        </RadioGroup>
 
 
         <LinearLayout
@@ -352,23 +301,6 @@
     </LinearLayout>
 
 
-
-
-
-    <Button
-        android:id="@+id/btn_delete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:visibility="gone"
-        android:text="删库跑路"/>
-    <Button
-        android:id="@+id/btn_test"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:visibility="gone"
-        android:text="测试专用"/>
 
 
 

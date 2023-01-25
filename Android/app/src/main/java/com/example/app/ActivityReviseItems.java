@@ -24,7 +24,6 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.app.database.ItemsDBHelper;
@@ -55,7 +54,8 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
     private EditText et_brief;
     private EditText et_items_brief;
     private ImageView iv_img_show;
-    private ImageView iv_img_show_2;
+    private ImageView btn_add_img;
+    private ImageView btn_crop_img;
 
     // 物品首选分类分成衣橱内物品和其他物品，衣橱内用 0 表示，其他用 1 表示
     // clothing代表衣物，bedding代表床单被褥，clothes是上述两者总称呼
@@ -79,8 +79,6 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
     private final int IN_STORE = 1;
 
     private static String namePath = staticData.EMPTY;
-    private static Uri mUri;
-    private ActivityResultLauncher<Intent> registerC;
 
     private clothesInfo mClothesInfo;
     private itemsInfo mItemsInfo;
@@ -92,7 +90,7 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_revise_items);
+        setContentView(R.layout.activity_revise_items_2);
 
 
         RadioGroup rg_clothes = findViewById(R.id.rg_type);
@@ -100,10 +98,10 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
         rb_clothing = findViewById(R.id.rb_clothing);
         rb_bedding = findViewById(R.id.rb_bedding);
 
-        layout_clothes = (LinearLayout) findViewById(R.id.layout_clothes);
-        layout_items = (LinearLayout) findViewById(R.id.layout_items);
-        ll_clothingType = (LinearLayout) findViewById(R.id.ll_clothingType);
-        ll_beddingType = (LinearLayout) findViewById(R.id.ll_beddingType);
+        layout_clothes = findViewById(R.id.layout_clothes);
+        layout_items = findViewById(R.id.layout_items);
+        ll_clothingType = findViewById(R.id.ll_clothingType);
+        ll_beddingType = findViewById(R.id.ll_beddingType);
 
         sp_clothing_type = findViewById(R.id.sp_clothing_type);
         sp_bedding_type = findViewById(R.id.sp_bedding_type);
@@ -115,16 +113,17 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
         et_brief = findViewById(R.id.et_brief);
         et_items_brief = findViewById(R.id.et_items_brief);
         iv_img_show = findViewById(R.id.iv_img_show);
-        iv_img_show_2 = findViewById(R.id.iv_img_show_2);
+
 
         // 为图片添加按钮设置点击事件监听，弹出拍照或从相册选择按钮
-        Button btn_add_img = (Button) findViewById(R.id.btn_add_img);
+        btn_add_img = findViewById(R.id.btn_add_img);
         btn_add_img.setOnClickListener(v -> showPopupWindow());
+
+        btn_crop_img = findViewById(R.id.btn_crop_img);
+        btn_crop_img.setOnClickListener(this);
 
         findViewById(R.id.btn_save).setOnClickListener(this);
         findViewById(R.id.btn_exit).setOnClickListener(this);
-        findViewById(R.id.btn_delete).setOnClickListener(this);
-        findViewById(R.id.btn_crop_img).setOnClickListener(this);
 
         mDBHelper = ItemsDBHelper.getInstance(this);
         mDBHelper.openReadLink();
@@ -164,7 +163,7 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
                 iv_img_show.setImageBitmap(bitmap);
                 instance.setEditBitmap(bitmap);
                 Intent intent_crop = new Intent(this,ActivityCropper.class);
-//                startActivityForResult(intent_crop,CROP_REQUEST_CODE);
+                startActivityForResult(intent_crop,CROP_REQUEST_CODE);
 
             }
         }
@@ -173,7 +172,7 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
         if (requestCode == CROP_REQUEST_CODE) {
             if (instance.getEditBitmap() != null){
                 bitmapCropped = instance.getEditBitmap();
-                iv_img_show_2.setImageBitmap(bitmapCropped);
+                iv_img_show.setImageBitmap(bitmapCropped);
             }
         }
     }
@@ -235,9 +234,6 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
                 finish();
                 break;
 
-            case R.id.btn_delete:
-                mDBHelper.dataInit();
-                break;
 
             case R.id.btn_crop_img:
                 DataService instance = DataService.getInstance();

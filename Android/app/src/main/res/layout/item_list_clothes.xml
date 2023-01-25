@@ -27,10 +27,11 @@
         <TextView
             android:id="@+id/tv_list_clothes_name"
             android:layout_width="match_parent"
+            android:layout_marginTop="8dp"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="start|center"
-            android:textColor="@color/black"
+            android:textColor="@color/Pink_1"
             android:textSize="20sp"
             tools:text="衣服" />
 
@@ -53,6 +54,9 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:gravity="center"
+        android:background="@drawable/button_pink_ripple"
+        android:textColor="@color/white"
+        android:textSize="18sp"
         android:text="编辑" />
 
 </LinearLayout>

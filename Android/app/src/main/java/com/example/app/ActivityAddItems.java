@@ -1,5 +1,6 @@
 package com.example.app;
 
+import static android.os.Environment.DIRECTORY_DCIM;
 import static android.os.Environment.DIRECTORY_PICTURES;
 import static com.example.app.entity.staticData.IN_STORE;
 import static com.example.app.util.ToastUtil.show;
@@ -15,6 +16,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -35,6 +38,7 @@ import android.widget.TextView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import com.example.app.database.ItemsDBHelper;
 import com.example.app.entity.clothesInfo;
@@ -70,7 +74,8 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     private EditText et_brief;
     private EditText et_items_brief;
     private ImageView iv_img_show;
-    private ImageView iv_img_show_2;
+    private ImageView btn_add_img;
+    private ImageView btn_crop_img;
 
     // 物品首选分类分成衣橱内物品和其他物品，衣橱内用 0 表示，其他用 1 表示
     // clothing代表衣物，bedding代表床单被褥，clothes是上述两者总称呼
@@ -88,10 +93,13 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
 
     private final int ALBUM_REQUEST_CODE = 1;
     private final int CROP_REQUEST_CODE = 2;
+    private final int CAMERA_REQUEST_CODE = 3;
 
     private static String namePath = staticData.EMPTY;
     private static Uri mUri = null;
     private ActivityResultLauncher<Intent> register;
+    private File tempFile;
+    private Uri fileUri;
 
     private clothesInfo mClothesInfo;
     private itemsInfo mItemsInfo;
@@ -100,10 +108,12 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     private Bitmap bitmapCropped = null;
 
 
+
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_items);
+        setContentView(R.layout.activity_add_items_2);
 
         RadioGroup rg_clothes_or_items = findViewById(R.id.rg_clothes_or_items);
         rg_clothes_or_items.setOnCheckedChangeListener(this);
@@ -126,17 +136,19 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         et_brief = findViewById(R.id.et_brief);
         et_items_brief = findViewById(R.id.et_items_brief);
         iv_img_show = findViewById(R.id.iv_img_show);
-        iv_img_show_2 = findViewById(R.id.iv_img_show_2);
         iv_img_show.setImageResource(R.drawable.img_null);
+        iv_img_show.setOnClickListener(this);
 
         // 为图片添加按钮设置点击事件监听，弹出拍照或从相册选择按钮
-        Button btn_add_img = findViewById(R.id.btn_add_img);
+        btn_add_img = findViewById(R.id.btn_add_img);
         btn_add_img.setOnClickListener(v -> showPopupWindow());
+
+        btn_crop_img = findViewById(R.id.btn_crop_img);
+        btn_crop_img.setOnClickListener(this);
 
         findViewById(R.id.btn_save).setOnClickListener(this);
         findViewById(R.id.btn_exit).setOnClickListener(this);
         findViewById(R.id.btn_delete).setOnClickListener(this);
-        findViewById(R.id.btn_crop_img).setOnClickListener(this);
         findViewById(R.id.btn_test).setOnClickListener(this);
 
         // 创建数据对象
@@ -173,7 +185,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
 
                 instance.setEditBitmap(bitmap);
                 Intent intent_crop = new Intent(this,ActivityCropper.class);
-//                startActivityForResult(intent_crop,CROP_REQUEST_CODE);
+                startActivityForResult(intent_crop,CROP_REQUEST_CODE);
 
             }
         }
@@ -182,9 +194,29 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         if (requestCode == CROP_REQUEST_CODE) {
             if (instance.getEditBitmap() != null){
                 bitmapCropped = instance.getEditBitmap();
-                iv_img_show_2.setImageBitmap(bitmapCropped);
+                iv_img_show.setImageBitmap(bitmapCropped);
             }
         }
+
+        if (requestCode == CAMERA_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                //用相机返回的照片去调用剪裁也需要对Uri进行处理
+                    Uri contentUri = FileProvider.getUriForFile(this, "com.choosecrop.fileprovider", tempFile);
+
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentUri);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    iv_img_show.setImageBitmap(bitmap);
+
+                    instance.setEditBitmap(bitmap);
+                    Intent intent_crop = new Intent(this,ActivityCropper.class);
+                    startActivityForResult(intent_crop,CROP_REQUEST_CODE);
+
+            }
+        }
+
     }
 
 
@@ -556,5 +588,18 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         }
 
     }
+
+
+
+    private void getImgFromCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File CAMERA_CATCH_FILE = new File(Environment.getExternalStorageState());
+        File tempFile = new File(CAMERA_CATCH_FILE, "catch" + System.currentTimeMillis() + ".png");
+        fileUri = Uri.fromFile(tempFile);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+        startActivityForResult(intent, CAMERA_REQUEST_CODE);
+
+    }
+
 
 }

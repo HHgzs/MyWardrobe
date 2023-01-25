@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.example.app.ActivityWardrobe;
 import com.example.app.MyApplication;
 import com.example.app.R;
+import com.example.app.database.ItemsDBHelper;
 import com.example.app.entity.clothesInfo;
 import com.example.app.entity.staticData;
 import com.example.app.util.FileUtil;
@@ -28,14 +29,15 @@ public class ClothesAdapter extends BaseAdapter {
 
     private final Context mContext;
     private final List<clothesInfo> mClothesInfoList;
-
+    private final ItemsDBHelper mDBHelper;
 
 
     public ClothesAdapter(Context mContext, List<clothesInfo> mClothesInfoList) {
         this.mContext = mContext;
         this.mClothesInfoList = mClothesInfoList;
-    }
+        mDBHelper = ItemsDBHelper.getInstance(mContext);
 
+    }
 
 
     @Override
@@ -81,7 +83,6 @@ public class ClothesAdapter extends BaseAdapter {
         holder.ll_list_clothes.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
 
         if (!Objects.equals(clothesInfo.imgPath, staticData.EMPTY)) {
-
             // 根据imgPath读取图像为uri并显示出来
             String name = clothesInfo.imgPath;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
@@ -95,8 +96,29 @@ public class ClothesAdapter extends BaseAdapter {
 
         holder.tv_list_clothes_name.setText(clothesInfo.name);
         holder.tv_list_clothes_desc.setText(clothesInfo.brief);
+
+        if (clothesInfo.status > 0) {
+            holder.btn_edit.setText("在库");
+            holder.btn_edit.setTextColor(0xffffffff);
+        } else if (clothesInfo.status == 0) {
+            holder.btn_edit.setText("离库");
+            holder.btn_edit.setTextColor(0xffFF8E8E);
+        }
+
         holder.btn_edit.setOnClickListener(v -> {
-            ToastUtil.show(mContext, "按钮被点击了，" + clothesInfo.name);
+            if (clothesInfo.status == 0) {
+                clothesInfo.status = 1;
+                holder.btn_edit.setText("在库");
+                holder.btn_edit.setTextColor(0xffffffff);
+            } else if (clothesInfo.status > 0) {
+                clothesInfo.status = 0;
+                holder.btn_edit.setText("离库");
+                holder.btn_edit.setTextColor(0xffFF8E8E);
+            }
+            mDBHelper.openWriteLink();
+            mDBHelper.reviseClothesInfo(clothesInfo);
+            mDBHelper.closeLink();
+
         });
 
         return convertView;

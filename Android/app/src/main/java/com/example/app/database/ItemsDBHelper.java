@@ -247,6 +247,25 @@ public class ItemsDBHelper extends SQLiteOpenHelper {
     }
 
 
+    public void deleteClothesInfo(long id) {
+        try {
+            mWriteDB.delete(TABLE_CLOTHES_INFO,"_id=?",new String[]{String.valueOf(id)});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    public void deleteItemsInfo(long id) {
+        try {
+            mWriteDB.delete(TABLE_ITEMS_INFO,"_id=?", new String[]{String.valueOf(id)});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public void deleteAllInfo() {
         mWriteDB.delete(TABLE_CLOTHES_INFO,"1=1",null);
         mWriteDB.delete(TABLE_ITEMS_INFO,"1=1",null);

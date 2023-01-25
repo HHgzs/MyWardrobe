@@ -3,12 +3,18 @@ package com.example.app;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.example.app.adapter.ClothesAdapter;
 import com.example.app.database.ItemsDBHelper;
@@ -27,6 +33,9 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
     private ItemsDBHelper mDBHelper;
 
     private ListView lv_list_clothes;
+    private PopupWindow mPopWindow;
+
+    private long currentID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +64,11 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
 
 
 
+
+
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -71,6 +83,11 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
                 bl_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(bl_intent);
                 break;
+            case R.id.pop_btn_delete:
+                mDBHelper.deleteClothesInfo(currentID);
+                mPopWindow.dismiss();
+
+
         }
     }
 
@@ -82,7 +99,7 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        ToastUtil.show(this, "条目被点击了，" + clothesInfoList.get(position).name);
+//        ToastUtil.show(this, "条目被点击了，" + clothesInfoList.get(position).name);
 
         Intent intent = new Intent(this,ActivityReviseItems.class);
         Bundle bundle = new Bundle();
@@ -96,8 +113,10 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        ToastUtil.show(this, "条目被长按了，" + clothesInfoList.get(position).name);
-        return false;
+//        ToastUtil.show(this, "条目被长按了，" + clothesInfoList.get(position).name);
+        currentID = clothesInfoList.get(position).id;
+        showPopupWindow();
+        return true;
     }
 
 
@@ -105,6 +124,21 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
     public void finish() {
         super.finish();
         overridePendingTransition(R.anim.activity_anim_3,R.anim.activity_anim_4);
+    }
+
+
+    private void showPopupWindow() {
+        @SuppressLint("InflateParams") View contentView = LayoutInflater.from(this).inflate(R.layout.popupwindow_delete_items,null);
+        mPopWindow = new PopupWindow(contentView, LinearLayout.LayoutParams.MATCH_PARENT,200,true);
+        mPopWindow.setContentView(contentView);
+
+        TextView pop_btn_delete = contentView.findViewById(R.id.pop_btn_delete);
+        pop_btn_delete.setOnClickListener(this);
+
+        @SuppressLint("InflateParams") View rootView = LayoutInflater.from(this).inflate(R.layout.activity_add_items,null);
+        mPopWindow.showAtLocation(rootView, Gravity.BOTTOM,0,0);
+
+
     }
 
 }
