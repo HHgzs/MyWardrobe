@@ -55,17 +55,17 @@ public class dateUtil {
         mMonth = info.month;
         mDay = info.day;
 
-        if (mMonth + 1 < 10) {
+        if (mMonth < 10) {
             if (mDay < 10) {
-                mDateStr = mYear + "-" + "0" + (mMonth + 1) + "-"  + "0" + mDay;
+                mDateStr = mYear + "-" + "0" + mMonth + "-"  + "0" + mDay;
             } else {
-                mDateStr = mYear + "-" +  "0" + (mMonth + 1) + "-" + mDay;
+                mDateStr = mYear + "-" +  "0" + mMonth + "-" + mDay;
             }
         } else {
             if (mDay < 10) {
-                mDateStr = mYear + "-" + (mMonth + 1) + "-" + "0" + mDay;
+                mDateStr = mYear + "-" + mMonth + "-" + "0" + mDay;
             } else {
-                mDateStr = mYear + "-" + (mMonth + 1) + "-" + mDay;
+                mDateStr = mYear + "-" + mMonth + "-" + mDay;
             }
         }
 

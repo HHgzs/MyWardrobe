@@ -1,6 +1,8 @@
 package com.example.app;
 
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.OvershootInterpolator;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -27,6 +30,8 @@ import com.example.app.entity.staticData;
 import com.example.app.util.pixUtil;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ActivityWardrobe extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
@@ -34,6 +39,7 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
     private ImageView home_button;
     private ImageView blotter_button;
     private ImageView iv_head_image;
+    private ImageView iv_cover_head;
 
     private List<clothesInfo> clothesInfoList;
     private List<itemsInfo> itemsInfoList;
@@ -49,6 +55,7 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
     private int endX;
     private int moveX;
     private int page;
+    private boolean firstCreated = true;
 
 
     @Override
@@ -61,6 +68,7 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
         wardrobe_button = findViewById(R.id.wardrobe_button);
         blotter_button = findViewById(R.id.blotter_button);
         iv_head_image = findViewById(R.id.iv_head_image);
+        iv_cover_head = findViewById(R.id.iv_cover_head);
 
         home_button.setOnClickListener(this);
         wardrobe_button.setOnClickListener(this);
@@ -80,11 +88,38 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
     protected void onResume() {
         super.onResume();
 
+        @SuppressLint("ResourceType") Animator animator_left = AnimatorInflater.loadAnimator(this, R.anim.slide_left);
+        animator_left.setInterpolator(new OvershootInterpolator());
+        animator_left.setTarget(iv_head_image);
+
+        @SuppressLint("ResourceType") Animator animator_right = AnimatorInflater.loadAnimator(this, R.anim.slide_right);
+        animator_right.setInterpolator(new OvershootInterpolator());
+        animator_right.setTarget(iv_head_image);
+
+        @SuppressLint("ResourceType") Animator animator_bk = AnimatorInflater.loadAnimator(this, R.anim.bounce_up_high);
+        animator_bk.setInterpolator(new OvershootInterpolator());
+        animator_bk.setTarget(iv_cover_head);
+
+
+
         lv_list = findViewById(R.id.lv_list);
 
         if (page == staticData.PAGE_CLOTHES) {
 
-            iv_head_image.setImageResource(R.drawable.wardrobe_head_background);
+            if(!firstCreated) {
+                animator_right.start();
+                animator_bk.start();
+            }
+
+            Timer timer_right = new Timer();
+            timer_right.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    iv_head_image.setImageResource(R.drawable.wardrobe_head_background);
+                    timer_right.cancel(); //执行完毕停止定时器
+                }
+            }, 150);
+
             clothesInfoList = mDBHelper.queryAllClothesInfo();
 
             ClothesAdapter ClothesAdapter = new ClothesAdapter(this, clothesInfoList);
@@ -93,9 +128,26 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
             lv_list.setOnItemLongClickListener(this);
 
 
+
+
         } else if (page == staticData.PAGE_ITEMS) {
 
-            iv_head_image.setImageResource(R.drawable.chest_head_background);
+            if(!firstCreated) {
+                animator_left.start();
+                animator_bk.start();
+            }
+
+            Timer timer_left = new Timer();
+            timer_left.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    iv_head_image.setImageResource(R.drawable.chest_head_background);
+                    timer_left.cancel(); //执行完毕停止定时器
+                }
+            }, 150);
+
+
+
             itemsInfoList = mDBHelper.queryAllItemsInfo();
 
             ItemsAdapter ItemsAdapter = new ItemsAdapter(this, itemsInfoList);
@@ -104,10 +156,9 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
             lv_list.setOnItemLongClickListener(this);
 
 
-
-
         }
 
+        firstCreated = false;
 
     }
 
@@ -146,6 +197,7 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         super.onTouchEvent(event);
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 startX = (int) event.getX();
@@ -162,14 +214,14 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
                 Log.d("HH" , String.valueOf(moveX));
 
                 int height = pixUtil.dip2px(this,120);
-                if (endY < height) {
-                    if (moveX > 50) {
+                if (endY > 0) {
+                    if (moveX > 100) {
                         if (page != staticData.PAGE_CLOTHES) {
                             page = staticData.PAGE_CLOTHES;
                         }
                         onResume();
 
-                    } else if (moveX < -50) {
+                    } else if (moveX < -100) {
                         if (page != staticData.PAGE_ITEMS) {
                             page = staticData.PAGE_ITEMS;
                         }
@@ -237,20 +289,30 @@ public class ActivityWardrobe extends AppCompatActivity implements View.OnClickL
 
     private void showPopupWindow() {
 
+        // 动画初始化
+        @SuppressLint("ResourceType") Animator animator = AnimatorInflater.loadAnimator(this, R.anim.pop_up);
+        animator.setInterpolator(new OvershootInterpolator());
+
         int height = pixUtil.dip2px(this,80);
 
         @SuppressLint("InflateParams") View contentView = LayoutInflater.from(this).inflate(R.layout.popupwindow_delete_items,null);
         mPopWindow = new PopupWindow(contentView, LinearLayout.LayoutParams.MATCH_PARENT,height,true);
         mPopWindow.setContentView(contentView);
 
+        // 设置动画
+        animator.setTarget(contentView);
+
         TextView pop_btn_delete = contentView.findViewById(R.id.pop_btn_delete);
         pop_btn_delete.setOnClickListener(this);
 
+
         @SuppressLint("InflateParams") View rootView = LayoutInflater.from(this).inflate(R.layout.activity_wardrobe,null);
+
         mPopWindow.showAtLocation(rootView, Gravity.BOTTOM,0,0);
+
+        // 启用动画
+        animator.start();
 
 
     }
-
-
 }

@@ -3,7 +3,7 @@ package com.example.app.util;
 import android.graphics.Bitmap;
 
 public class DataService {
-    public  Bitmap editBitmap;
+    public Bitmap editBitmap;
 
     private static DataService dataService;
 
@@ -19,11 +19,15 @@ public class DataService {
     public static DataService getInstance() {
         if (dataService==null){
             synchronized (DataService.class) {
-                if (dataService==null) {
-                    dataService=new DataService();
+                if (dataService == null) {
+                    dataService = new DataService();
                 }
             }
         }
         return dataService;
+    }
+
+    public void initData() {
+        this.editBitmap = null;
     }
 }

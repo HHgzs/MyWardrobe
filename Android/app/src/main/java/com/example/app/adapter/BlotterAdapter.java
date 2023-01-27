@@ -1,5 +1,7 @@
 package com.example.app.adapter;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
@@ -7,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -81,6 +84,37 @@ public class BlotterAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
+
+        // 设置显示动画
+        @SuppressLint("ResourceType") Animator animator_name = AnimatorInflater.loadAnimator(mContext, R.anim.slide_in_left);
+        animator_name.setInterpolator(new OvershootInterpolator());
+        animator_name.setTarget(holder.tv_list_blotter_name);
+
+        @SuppressLint("ResourceType") Animator animator_desc = AnimatorInflater.loadAnimator(mContext, R.anim.slide_in_left);
+        animator_desc.setInterpolator(new OvershootInterpolator());
+        animator_desc.setTarget(holder.tv_list_blotter_desc);
+
+        @SuppressLint("ResourceType") Animator animator_time = AnimatorInflater.loadAnimator(mContext, R.anim.slide_in_left);
+        animator_time.setInterpolator(new OvershootInterpolator());
+        animator_time.setTarget(holder.tv_list_blotter_time);
+
+        @SuppressLint("ResourceType") Animator animator_btn = AnimatorInflater.loadAnimator(mContext, R.anim.pop_in);
+        animator_btn.setInterpolator(new OvershootInterpolator());
+        animator_btn.setTarget(holder.btn_list_blotter_add);
+
+        @SuppressLint("ResourceType") Animator animator_press = AnimatorInflater.loadAnimator(mContext, R.anim.bounce_here);
+        animator_press.setInterpolator(new OvershootInterpolator());
+        animator_press.setTarget(holder.btn_list_blotter_add);
+
+
+
+
+
+
+
+
+
+
         blotterInfo blotterInfo = mBlotterInfoList.get(position);
         holder.ll_list_blotter.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
 
@@ -91,7 +125,17 @@ public class BlotterAdapter extends BaseAdapter {
         String applyDate = dateUtil.publishDate(dateUtil.readDate(blotterInfo.applyTime));
         holder.tv_list_blotter_time.setText(applyDate);
 
+
+        animator_name.start();
+        animator_desc.start();
+        animator_time.start();
+        animator_btn.start();
+
+
+
         holder.btn_list_blotter_add.setOnClickListener(v -> {
+
+            animator_press.start();
 
             String tableName = blotterInfo.table_name;
             List<noteInfo> noteInfoList = mDBHelper.queryAllNotesInfo(tableName);
@@ -104,10 +148,10 @@ public class BlotterAdapter extends BaseAdapter {
 
                 boolean exist = false;
 
-                for(int j = 0; j < MyApplication.noteInfoList.size(); i++) {
+                for(int j = 0; j < MyApplication.noteInfoList.size(); j++) {
 
-                    if (MyApplication.noteInfoList.get(i).items_id == (info.items_id) &&
-                            MyApplication.noteInfoList.get(i).type == (info.type)) {
+                    if (MyApplication.noteInfoList.get(j).items_id == (info.items_id) &&
+                            MyApplication.noteInfoList.get(j).type == (info.type)) {
                         exist = true;
                         break;
                     }

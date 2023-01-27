@@ -2,6 +2,8 @@ package com.example.app;
 
 import static com.example.app.util.ToastUtil.show;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -12,6 +14,7 @@ import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.OvershootInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -316,9 +319,17 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
 
     // 显示下方弹出列表
     private void showPopupWindow() {
+
+        // 动画初始化
+        @SuppressLint("ResourceType") Animator animator = AnimatorInflater.loadAnimator(this, R.anim.pop_up);
+        animator.setInterpolator(new OvershootInterpolator());
+
         @SuppressLint("InflateParams") View contentView = LayoutInflater.from(this).inflate(R.layout.popupwindow_add_img,null);
         mPopWindow = new PopupWindow(contentView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT,true);
         mPopWindow.setContentView(contentView);
+
+        // 设置动画
+        animator.setTarget(contentView);
 
         TextView pop_btn_catch = (TextView) contentView.findViewById(R.id.pop_btn_catch);
         TextView pop_btn_album = (TextView) contentView.findViewById(R.id.pop_btn_album);
@@ -327,7 +338,8 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
         @SuppressLint("InflateParams") View rootView = LayoutInflater.from(this).inflate(R.layout.activity_add_items,null);
         mPopWindow.showAtLocation(rootView, Gravity.BOTTOM,0,0);
 
-
+        // 启用动画
+        animator.start();
     }
 
     // 为多个下拉列表设置适配器
@@ -375,7 +387,7 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mDBHelper.closeLink();
+//        mDBHelper.closeLink();
     }
 
 

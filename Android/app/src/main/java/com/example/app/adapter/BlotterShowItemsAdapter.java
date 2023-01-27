@@ -1,5 +1,7 @@
 package com.example.app.adapter;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
@@ -7,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -64,6 +67,7 @@ public class BlotterShowItemsAdapter extends BaseAdapter {
             holder = new ViewHolder();
             holder.ll_list_blotter_show = convertView.findViewById(R.id.ll_list_blotter_show);
             holder.iv_list_blotter_show_img = convertView.findViewById(R.id.iv_list_blotter_show_img);
+            holder.iv_cover_image = convertView.findViewById(R.id.iv_cover_image);
             holder.tv_list_blotter_show_name = convertView.findViewById(R.id.tv_list_blotter_show_name);
             holder.tv_list_blotter_show_desc = convertView.findViewById(R.id.tv_list_blotter_show_desc);
             holder.btn_add = convertView.findViewById(R.id.btn_add);
@@ -74,6 +78,37 @@ public class BlotterShowItemsAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
+
+
+
+        // 设置显示动画
+        @SuppressLint("ResourceType") Animator animator_img = AnimatorInflater.loadAnimator(mContext, R.anim.pop_in);
+        animator_img.setInterpolator(new OvershootInterpolator());
+        animator_img.setTarget(holder.iv_list_blotter_show_img);
+
+        @SuppressLint("ResourceType") Animator animator_cover = AnimatorInflater.loadAnimator(mContext, R.anim.pop_in);
+        animator_cover.setInterpolator(new OvershootInterpolator());
+        animator_cover.setTarget(holder.iv_cover_image);
+
+        @SuppressLint("ResourceType") Animator animator_name = AnimatorInflater.loadAnimator(mContext, R.anim.show_in);
+        animator_name.setInterpolator(new OvershootInterpolator());
+        animator_name.setTarget(holder.tv_list_blotter_show_name);
+
+        @SuppressLint("ResourceType") Animator animator_desc = AnimatorInflater.loadAnimator(mContext, R.anim.show_in);
+        animator_desc.setInterpolator(new OvershootInterpolator());
+        animator_desc.setTarget(holder.tv_list_blotter_show_desc);
+
+        @SuppressLint("ResourceType") Animator animator_add = AnimatorInflater.loadAnimator(mContext, R.anim.pop_in);
+        animator_add.setInterpolator(new OvershootInterpolator());
+        animator_add.setTarget(holder.btn_add);
+
+        @SuppressLint("ResourceType") Animator animator_press = AnimatorInflater.loadAnimator(mContext, R.anim.bounce_here);
+        animator_press.setInterpolator(new OvershootInterpolator());
+        animator_press.setTarget(holder.btn_add);
+
+
+
+
 
         itemsInfo itemsInfo = mItemsInfoList.get(position);
         holder.ll_list_blotter_show.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
@@ -109,7 +144,16 @@ public class BlotterShowItemsAdapter extends BaseAdapter {
         holder.tv_list_blotter_show_desc.setText(itemsInfo.brief);
 
 
+        animator_img.start();
+        animator_cover.start();
+        animator_name.start();
+        animator_desc.start();
+        animator_add.start();
+
+
         holder.btn_add.setOnClickListener(v -> {
+
+            animator_press.start();
 
             if (!isAdded) {
                 try {
@@ -119,11 +163,6 @@ public class BlotterShowItemsAdapter extends BaseAdapter {
 
                     MyApplication.noteInfoList.add(noteInfo);
 
-                    for(int i = 0; i < MyApplication.noteInfoList.size(); i++) {
-                        Log.d("HH", "+" + String.valueOf(MyApplication.noteInfoList.get(i).items_id));
-                    }
-
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -131,24 +170,22 @@ public class BlotterShowItemsAdapter extends BaseAdapter {
             } else if(isAdded) {
                 try {
                     isAdded = false;
+
                     holder.btn_add.setTextColor(0xffffffff);
                     holder.btn_add.setText("添加");
+
                     for(int i = 0; i < MyApplication.noteInfoList.size(); i++) {
                         if( MyApplication.noteInfoList.get(i).items_id == (noteInfo.items_id) &&
                                 MyApplication.noteInfoList.get(i).type == (noteInfo.type)) {
-                            Log.d("HH", "-" + String.valueOf(MyApplication.noteInfoList.get(i).items_id));
+
                             MyApplication.noteInfoList.remove(i);
                             i--;
                         }
-
                     }
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             }
-
         });
 
         return convertView;
@@ -157,6 +194,7 @@ public class BlotterShowItemsAdapter extends BaseAdapter {
     public static final class ViewHolder {
         public LinearLayout ll_list_blotter_show;
         public ImageView iv_list_blotter_show_img;
+        public ImageView iv_cover_image;
         public TextView tv_list_blotter_show_name;
         public TextView tv_list_blotter_show_desc;
         public Button btn_add;

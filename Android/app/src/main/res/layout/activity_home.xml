@@ -43,47 +43,43 @@
 
                 <Button
                     android:layout_width="wrap_content"
-                    android:layout_height="115dp"
+                    android:layout_height="105dp"
                     android:background="@drawable/blotter_new_ripple" />
                 <Button
                     android:layout_width="wrap_content"
-                    android:layout_height="115dp"
+                    android:layout_height="105dp"
                     android:background="@drawable/blotter_new_ripple" />
                 <Button
                     android:layout_width="wrap_content"
-                    android:layout_height="115dp"
+                    android:layout_height="105dp"
                     android:background="@drawable/blotter_new_ripple" />
                 <Button
                     android:layout_width="wrap_content"
-                    android:layout_height="115dp"
+                    android:layout_height="105dp"
                     android:background="@drawable/blotter_new_ripple" />
                 <Button
                     android:layout_width="wrap_content"
-                    android:layout_height="115dp"
+                    android:layout_height="105dp"
                     android:background="@drawable/blotter_new_ripple" />
                 <Button
                     android:layout_width="wrap_content"
-                    android:layout_height="115dp"
+                    android:layout_height="105dp"
                     android:background="@drawable/blotter_new_ripple" />
                 <Button
                     android:layout_width="wrap_content"
-                    android:layout_height="115dp"
+                    android:layout_height="105dp"
                     android:background="@drawable/blotter_new_ripple" />
                 <Button
                     android:layout_width="wrap_content"
-                    android:layout_height="115dp"
+                    android:layout_height="105dp"
                     android:background="@drawable/blotter_new_ripple" />
                 <Button
                     android:layout_width="wrap_content"
-                    android:layout_height="115dp"
+                    android:layout_height="105dp"
                     android:background="@drawable/blotter_new_ripple" />
                 <Button
                     android:layout_width="wrap_content"
-                    android:layout_height="115dp"
-                    android:background="@drawable/blotter_new_ripple" />
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="115dp"
+                    android:layout_height="105dp"
                     android:background="@drawable/blotter_new_ripple" />
 
 

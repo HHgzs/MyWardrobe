@@ -1,5 +1,7 @@
 package com.example.app.adapter;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
@@ -7,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -68,6 +71,7 @@ public class NoteShowAdapter extends BaseAdapter {
             holder = new ViewHolder();
             holder.ll_list_note_show = convertView.findViewById(R.id.ll_list_blotter_show);
             holder.iv_list_note_show_img = convertView.findViewById(R.id.iv_list_note_show_img);
+            holder.iv_cover_image = convertView.findViewById(R.id.iv_cover_image);
             holder.tv_list_note_show_name = convertView.findViewById(R.id.tv_list_note_show_name);
             holder.tv_list_note_show_desc = convertView.findViewById(R.id.tv_list_note_show_desc);
 
@@ -76,6 +80,27 @@ public class NoteShowAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
+
+
+
+        // 设置显示动画
+        @SuppressLint("ResourceType") Animator animator_img = AnimatorInflater.loadAnimator(mContext, R.anim.pop_in);
+        animator_img.setInterpolator(new OvershootInterpolator());
+        animator_img.setTarget(holder.iv_list_note_show_img);
+
+        @SuppressLint("ResourceType") Animator animator_cover = AnimatorInflater.loadAnimator(mContext, R.anim.pop_in);
+        animator_cover.setInterpolator(new OvershootInterpolator());
+        animator_cover.setTarget(holder.iv_cover_image);
+
+        @SuppressLint("ResourceType") Animator animator_name = AnimatorInflater.loadAnimator(mContext, R.anim.show_in);
+        animator_name.setInterpolator(new OvershootInterpolator());
+        animator_name.setTarget(holder.tv_list_note_show_name);
+
+        @SuppressLint("ResourceType") Animator animator_desc = AnimatorInflater.loadAnimator(mContext, R.anim.show_in);
+        animator_desc.setInterpolator(new OvershootInterpolator());
+        animator_desc.setTarget(holder.tv_list_note_show_desc);
+
+
 
         mDBHelper = ItemsDBHelper.getInstance(mContext);
         mDBHelper.openReadLink();
@@ -113,6 +138,12 @@ public class NoteShowAdapter extends BaseAdapter {
         }
 
 
+        animator_img.start();
+        animator_cover.start();
+        animator_name.start();
+        animator_desc.start();
+
+
         return convertView;
     }
 
@@ -120,6 +151,7 @@ public class NoteShowAdapter extends BaseAdapter {
     public static final class ViewHolder {
         public LinearLayout ll_list_note_show;
         public ImageView iv_list_note_show_img;
+        public ImageView iv_cover_image;
         public TextView tv_list_note_show_name;
         public TextView tv_list_note_show_desc;
     }

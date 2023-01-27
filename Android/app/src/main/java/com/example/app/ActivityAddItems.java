@@ -5,6 +5,8 @@ import static android.os.Environment.DIRECTORY_PICTURES;
 import static com.example.app.entity.staticData.IN_STORE;
 import static com.example.app.util.ToastUtil.show;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -24,6 +26,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.OvershootInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -162,6 +165,10 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         mDBHelper = ItemsDBHelper.getInstance(this);
         mDBHelper.openReadLink();
         mDBHelper.openWriteLink();
+
+        DataService instance = DataService.getInstance();
+        instance.initData();
+
         // 初始化下拉列表
         initSpinner();
     }
@@ -245,6 +252,8 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         namePath = FileUtil.saveImageAndGetName(this,bitmap);
                     }
+                } else {
+                    namePath = staticData.EMPTY;
                 }
 
 
@@ -382,12 +391,19 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     // 显示下方弹出列表
     private void showPopupWindow() {
 
+        // 动画初始化
+        @SuppressLint("ResourceType") Animator animator = AnimatorInflater.loadAnimator(this, R.anim.pop_up);
+        animator.setInterpolator(new OvershootInterpolator());
+
+
         int height = pixUtil.dip2px(this, 150);
 
         @SuppressLint("InflateParams") View contentView = LayoutInflater.from(this).inflate(R.layout.popupwindow_add_img,null);
         mPopWindow = new PopupWindow(contentView, LinearLayout.LayoutParams.MATCH_PARENT, height,true);
         mPopWindow.setContentView(contentView);
 
+        // 设置动画
+        animator.setTarget(contentView);
 
         TextView pop_btn_catch = contentView.findViewById(R.id.pop_btn_catch);
         TextView pop_btn_album = contentView.findViewById(R.id.pop_btn_album);
@@ -396,6 +412,8 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
         @SuppressLint("InflateParams") View rootView = LayoutInflater.from(this).inflate(R.layout.activity_add_items,null);
         mPopWindow.showAtLocation(rootView, Gravity.BOTTOM,0,0);
 
+        // 启用动画
+        animator.start();
 
     }
 
@@ -444,7 +462,7 @@ public class ActivityAddItems extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mDBHelper.closeLink();
+//        mDBHelper.closeLink();
     }
 
     private static String getTime() {

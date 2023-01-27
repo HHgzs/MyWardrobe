@@ -2,6 +2,8 @@ package com.example.app.adapter;
 
 import static com.example.app.util.ToastUtil.show;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
@@ -11,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -72,6 +75,7 @@ public class ItemsAdapter extends BaseAdapter implements View.OnClickListener{
             holder = new ViewHolder();
             holder.ll_list_items = convertView.findViewById(R.id.ll_list_items);
             holder.iv_list_items_img = convertView.findViewById(R.id.iv_list_items_img);
+            holder.iv_cover_image = convertView.findViewById(R.id.iv_cover_image);
             holder.tv_list_items_name = convertView.findViewById(R.id.tv_list_items_name);
             holder.tv_list_items_desc = convertView.findViewById(R.id.tv_list_items_desc);
             holder.et_num_show = convertView.findViewById(R.id.et_num_show);
@@ -85,6 +89,56 @@ public class ItemsAdapter extends BaseAdapter implements View.OnClickListener{
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
+
+
+        // 设置数量变化动画
+        @SuppressLint("ResourceType") Animator animator_add = AnimatorInflater.loadAnimator(mContext, R.anim.bounce_here);
+        animator_add.setInterpolator(new OvershootInterpolator());
+        animator_add.setTarget(holder.btn_num_add);
+
+        @SuppressLint("ResourceType") Animator animator_minus = AnimatorInflater.loadAnimator(mContext, R.anim.bounce_here);
+        animator_minus.setInterpolator(new OvershootInterpolator());
+        animator_minus.setTarget(holder.btn_num_minus);
+
+        @SuppressLint("ResourceType") Animator animator_num_add = AnimatorInflater.loadAnimator(mContext, R.anim.bounce_up);
+        animator_num_add.setInterpolator(new OvershootInterpolator());
+        animator_num_add.setTarget(holder.et_num_show);
+
+        @SuppressLint("ResourceType") Animator animator_num_minus = AnimatorInflater.loadAnimator(mContext, R.anim.bounce_down);
+        animator_num_minus.setInterpolator(new OvershootInterpolator());
+        animator_num_minus.setTarget(holder.et_num_show);
+
+
+        // 设置显示动画
+        @SuppressLint("ResourceType") Animator animator_img = AnimatorInflater.loadAnimator(mContext, R.anim.pop_in);
+        animator_img.setInterpolator(new OvershootInterpolator());
+        animator_img.setTarget(holder.iv_list_items_img);
+
+        @SuppressLint("ResourceType") Animator animator_cover = AnimatorInflater.loadAnimator(mContext, R.anim.pop_in);
+        animator_cover.setInterpolator(new OvershootInterpolator());
+        animator_cover.setTarget(holder.iv_cover_image);
+
+        @SuppressLint("ResourceType") Animator animator_name = AnimatorInflater.loadAnimator(mContext, R.anim.show_in);
+        animator_name.setInterpolator(new OvershootInterpolator());
+        animator_name.setTarget(holder.tv_list_items_name);
+
+        @SuppressLint("ResourceType") Animator animator_desc = AnimatorInflater.loadAnimator(mContext, R.anim.show_in);
+        animator_desc.setInterpolator(new OvershootInterpolator());
+        animator_desc.setTarget(holder.tv_list_items_desc);
+
+        @SuppressLint("ResourceType") Animator animator_add_init = AnimatorInflater.loadAnimator(mContext, R.anim.pop_in);
+        animator_add_init.setInterpolator(new OvershootInterpolator());
+        animator_add_init.setTarget(holder.btn_num_add);
+
+        @SuppressLint("ResourceType") Animator animator_minus_init = AnimatorInflater.loadAnimator(mContext, R.anim.pop_in);
+        animator_minus_init.setInterpolator(new OvershootInterpolator());
+        animator_minus_init.setTarget(holder.btn_num_minus);
+
+        @SuppressLint("ResourceType") Animator animator_num_init = AnimatorInflater.loadAnimator(mContext, R.anim.pop_in);
+        animator_num_init.setInterpolator(new OvershootInterpolator());
+        animator_num_init.setTarget(holder.et_num_show);
+
+
 
 
         itemsInfo itemsInfo = mItemsInfoList.get(position);
@@ -112,6 +166,19 @@ public class ItemsAdapter extends BaseAdapter implements View.OnClickListener{
             holder.btn_num_minus.setActivated(true);
         }
 
+        // 运行动画
+        animator_img.start();
+        animator_cover.start();
+        animator_name.start();
+        animator_desc.start();
+        animator_num_init.start();
+        animator_add_init.start();
+        animator_minus_init.start();
+
+
+
+
+
 
         holder.btn_num_add.setOnClickListener(v -> {
             itemsInfo.status = itemsInfo.status + 1;
@@ -119,6 +186,11 @@ public class ItemsAdapter extends BaseAdapter implements View.OnClickListener{
             if (itemsInfo.status > 0) {
                 holder.btn_num_minus.setActivated(true);
             }
+
+            // 开始动画
+            animator_add.start();
+            animator_num_add.start();
+
             mDBHelper.openWriteLink();
             mDBHelper.reviseItemsInfo(itemsInfo);
 //            mDBHelper.closeLink();
@@ -128,16 +200,22 @@ public class ItemsAdapter extends BaseAdapter implements View.OnClickListener{
 
 
         holder.btn_num_minus.setOnClickListener(v -> {
+
+            // 开始动画
+            animator_minus.start();
+
             if (itemsInfo.status > 0) {
                 itemsInfo.status = itemsInfo.status - 1;
                 holder.et_num_show.setText(String.valueOf(itemsInfo.status));
                 if (itemsInfo.status < 1) {
                     holder.btn_num_minus.setActivated(false);
                 }
+                // 开始动画
+                animator_num_minus.start();
 
                 mDBHelper.openWriteLink();
                 mDBHelper.reviseItemsInfo(itemsInfo);
-//                mDBHelper.closeLink();
+
             }
 
         });
@@ -189,6 +267,7 @@ public class ItemsAdapter extends BaseAdapter implements View.OnClickListener{
     public static final class ViewHolder {
         public LinearLayout ll_list_items;
         public ImageView iv_list_items_img;
+        public ImageView iv_cover_image;
         public TextView tv_list_items_name;
         public TextView tv_list_items_desc;
         public EditText et_num_show;

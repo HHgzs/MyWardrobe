@@ -2,12 +2,15 @@ package com.example.app;
 
 import static com.example.app.util.ToastUtil.show;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.OvershootInterpolator;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -180,6 +183,12 @@ public class ActivityAddBlotter extends AppCompatActivity implements View.OnClic
                 mDay = dateInfo.day;
                 createdData = dateInfo.dateStr;
                 new DatePickerDialog(this,onDateSetListener,mYear, mMonth, mDay).show();
+
+                @SuppressLint("ResourceType") Animator animator_add_time = AnimatorInflater.loadAnimator(this, R.anim.bounce_here);
+                animator_add_time.setInterpolator(new OvershootInterpolator());
+                animator_add_time.setTarget(btn_blotter_set_time);
+                animator_add_time.start();
+
                 break;
 
 
@@ -268,8 +277,8 @@ public class ActivityAddBlotter extends AppCompatActivity implements View.OnClic
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mBlotterDBHelper.closeLink();
-        mItemsDBHelper.closeLink();
+//        mBlotterDBHelper.closeLink();
+//        mItemsDBHelper.closeLink();
     }
 
 

@@ -6,10 +6,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 
@@ -67,11 +71,11 @@ public class ActivityHome extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.float_button:
+
                 if (PermissionUtil.checkPermission(this, PERMISSIONS, REQUEST_CODE_STORAGE)) {
                     Intent intent = new Intent(this, ActivityAddItems.class);
                     startActivity(intent);
                 }
-
                 break;
         }
     }

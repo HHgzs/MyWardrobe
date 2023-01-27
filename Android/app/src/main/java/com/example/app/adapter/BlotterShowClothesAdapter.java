@@ -1,5 +1,7 @@
 package com.example.app.adapter;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -78,6 +81,38 @@ public class BlotterShowClothesAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
+
+
+        // 设置显示动画
+        @SuppressLint("ResourceType") Animator animator_img = AnimatorInflater.loadAnimator(mContext, R.anim.pop_in);
+        animator_img.setInterpolator(new OvershootInterpolator());
+        animator_img.setTarget(holder.iv_list_blotter_show_img);
+
+        @SuppressLint("ResourceType") Animator animator_cover = AnimatorInflater.loadAnimator(mContext, R.anim.pop_in);
+        animator_cover.setInterpolator(new OvershootInterpolator());
+        animator_cover.setTarget(holder.iv_cover_image);
+
+        @SuppressLint("ResourceType") Animator animator_name = AnimatorInflater.loadAnimator(mContext, R.anim.show_in);
+        animator_name.setInterpolator(new OvershootInterpolator());
+        animator_name.setTarget(holder.tv_list_blotter_show_name);
+
+        @SuppressLint("ResourceType") Animator animator_desc = AnimatorInflater.loadAnimator(mContext, R.anim.show_in);
+        animator_desc.setInterpolator(new OvershootInterpolator());
+        animator_desc.setTarget(holder.tv_list_blotter_show_desc);
+
+        @SuppressLint("ResourceType") Animator animator_add = AnimatorInflater.loadAnimator(mContext, R.anim.pop_in);
+        animator_add.setInterpolator(new OvershootInterpolator());
+        animator_add.setTarget(holder.btn_add);
+
+        @SuppressLint("ResourceType") Animator animator_press = AnimatorInflater.loadAnimator(mContext, R.anim.bounce_here);
+        animator_press.setInterpolator(new OvershootInterpolator());
+        animator_press.setTarget(holder.btn_add);
+
+
+
+
+
+
         clothesInfo clothesInfo = mClothesInfoList.get(position);
         holder.ll_list_blotter_show.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
 
@@ -114,8 +149,18 @@ public class BlotterShowClothesAdapter extends BaseAdapter {
         holder.tv_list_blotter_show_desc.setText(clothesInfo.brief);
 
 
+        animator_img.start();
+        animator_cover.start();
+        animator_name.start();
+        animator_desc.start();
+        animator_add.start();
+
+
+
+
         holder.btn_add.setOnClickListener(v -> {
 
+            animator_press.start();
 
             if (!isAdded) {
                 try {
@@ -163,6 +208,7 @@ public class BlotterShowClothesAdapter extends BaseAdapter {
     public static final class ViewHolder {
         public LinearLayout ll_list_blotter_show;
         public ImageView iv_list_blotter_show_img;
+        public ImageView iv_cover_image;
         public TextView tv_list_blotter_show_name;
         public TextView tv_list_blotter_show_desc;
         public Button btn_add;

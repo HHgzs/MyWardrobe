@@ -2,12 +2,15 @@ package com.example.app;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.OvershootInterpolator;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -104,6 +107,7 @@ public class ActivityBlotter extends AppCompatActivity implements View.OnClickLi
                 break;
 
             case R.id.iv_blotter_add:
+
                 Intent intent_blotter = new Intent(this,ActivityAddBlotter.class);
                 startActivity(intent_blotter);
                 break;
@@ -154,11 +158,18 @@ public class ActivityBlotter extends AppCompatActivity implements View.OnClickLi
 
     private void showPopupWindow() {
 
+        // 动画初始化
+        @SuppressLint("ResourceType") Animator animator = AnimatorInflater.loadAnimator(this, R.anim.pop_up);
+        animator.setInterpolator(new OvershootInterpolator());
+
         int height = pixUtil.dip2px(this,80);
 
         @SuppressLint("InflateParams") View contentView = LayoutInflater.from(this).inflate(R.layout.popupwindow_delete_items,null);
         mPopWindow = new PopupWindow(contentView, LinearLayout.LayoutParams.MATCH_PARENT,height,true);
         mPopWindow.setContentView(contentView);
+
+        // 设置动画
+        animator.setTarget(contentView);
 
         TextView pop_btn_delete = contentView.findViewById(R.id.pop_btn_delete);
         pop_btn_delete.setOnClickListener(this);
@@ -166,6 +177,8 @@ public class ActivityBlotter extends AppCompatActivity implements View.OnClickLi
         @SuppressLint("InflateParams") View rootView = LayoutInflater.from(this).inflate(R.layout.activity_blotter,null);
         mPopWindow.showAtLocation(rootView, Gravity.BOTTOM,0,0);
 
+        // 启用动画
+        animator.start();
 
     }
 

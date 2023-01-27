@@ -17,6 +17,7 @@
 
         <item name="android:datePickerDialogTheme">@style/MyDatePickerDialogTheme</item>
 
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
 
     </style>
 

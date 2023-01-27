@@ -25,6 +25,7 @@
 
 
             <ImageView
+                android:id="@+id/iv_cover_head"
                 android:layout_width="match_parent"
                 android:layout_height="123dp"
                 android:scaleType="fitXY"
