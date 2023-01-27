@@ -20,8 +20,10 @@ import com.example.app.database.BlotterDBHelper;
 import com.example.app.database.ItemsDBHelper;
 import com.example.app.entity.blotterInfo;
 import com.example.app.entity.staticData;
+import com.example.app.util.ListViewForScrollView;
 import com.example.app.util.pixUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ActivityBlotter extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
@@ -29,7 +31,7 @@ public class ActivityBlotter extends AppCompatActivity implements View.OnClickLi
     private ImageView wardrobe_button;
     private ImageView home_button;
     private ImageView blotter_button;
-    private ListView lv_blotter_list;
+    private ListViewForScrollView lv_blotter_list;
     private ImageView iv_blotter_add;
     private PopupWindow mPopWindow;
 
@@ -46,7 +48,7 @@ public class ActivityBlotter extends AppCompatActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         overridePendingTransition(R.anim.activity_anim_1,R.anim.activity_anim_2);
-        setContentView(R.layout.activity_blotter);
+        setContentView(R.layout.activity_blotter_2);
 
         iv_blotter_add = findViewById(R.id.iv_blotter_add);
         home_button = findViewById(R.id.home_button);
@@ -65,6 +67,7 @@ public class ActivityBlotter extends AppCompatActivity implements View.OnClickLi
         mDBHelper = BlotterDBHelper.getInstance(this);
         mDBHelper.openReadLink();
         mDBHelper.openWriteLink();
+        MyApplication.noteInfoList = new ArrayList<>();
 
 
     }
@@ -93,19 +96,24 @@ public class ActivityBlotter extends AppCompatActivity implements View.OnClickLi
                 home_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(home_intent);
                 break;
+
             case R.id.wardrobe_button:
                 Intent wr_intent = new Intent(this, ActivityWardrobe.class);
                 wr_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(wr_intent);
                 break;
+
             case R.id.iv_blotter_add:
                 Intent intent_blotter = new Intent(this,ActivityAddBlotter.class);
                 startActivity(intent_blotter);
+                break;
+
             case R.id.pop_btn_delete:
                 mDBHelper.deleteBlotterInfo(currentID);
                 mDBHelper.deleteTableInfo(currentName);
                 mPopWindow.dismiss();
                 onResume();
+                break;
         }
     }
 
@@ -124,9 +132,12 @@ public class ActivityBlotter extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-
-
+        Intent intent = new Intent(this, ActivityShowBlotter.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("tableName",blotterInfoList.get(position).table_name);
+        bundle.putInt("blotterID",blotterInfoList.get(position).id);
+        intent.putExtras(bundle);
+        startActivity(intent);
 
     }
 
@@ -154,6 +165,18 @@ public class ActivityBlotter extends AppCompatActivity implements View.OnClickLi
 
         @SuppressLint("InflateParams") View rootView = LayoutInflater.from(this).inflate(R.layout.activity_blotter,null);
         mPopWindow.showAtLocation(rootView, Gravity.BOTTOM,0,0);
+
+
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+
+
+
 
 
     }

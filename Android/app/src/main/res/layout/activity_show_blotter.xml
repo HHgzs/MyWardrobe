@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ActivityAddItems"
+    android:orientation="vertical"
+    android:background="@drawable/add_items_background"
+    android:paddingTop="35dp"
+    android:paddingLeft="40dp"
+    android:paddingRight="40dp"
+    android:paddingBottom="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="便签"
+            android:layout_marginLeft="10dp"
+            android:gravity="center"
+            android:textColor="@color/Pink_1"
+            android:textSize="30sp"/>
+
+        <TextView
+            android:id="@+id/tv_show_blotter_name"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:gravity="center|left"
+            android:layout_weight="1"
+            android:textColor="@color/gray_2"
+            android:textSize="20sp"
+            tools:text="便签名称" />
+
+        <ImageView
+            android:id="@+id/btn_show_blotter_back"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/back_button_selector"/>
+
+
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_marginLeft="25dp"
+        android:layout_height="50dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textColor="@color/Pink_1"
+                android:textSize="18sp"
+                android:text="创建日期"/>
+
+            <TextView
+                android:id="@+id/tv_show_blotter_created_time"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textColor="@color/gray_2"
+                android:textSize="18sp"
+                tools:text="2023-02-03"
+                />
+
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textColor="@color/Pink_1"
+                android:textSize="18sp"
+                android:text="应用日期"/>
+
+            <TextView
+                android:id="@+id/tv_show_blotter_apply_time"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textColor="@color/Pink_1"
+                android:textSize="18sp"
+                tools:text="2023-03-04"/>
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/et_blotter_name"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:textSize="20sp"
+            tools:text="01"
+            />
+
+
+    </LinearLayout>
+
+
+
+
+
+
+    <LinearLayout
+        android:id="@+id/layout_clothes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+
+        <RadioGroup
+            android:id="@+id/rg_type"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            android:layout_margin="5dp"
+            >
+
+            <RadioButton
+                android:id="@+id/rb_clothing"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:buttonTint="@color/transparent00"
+                android:background="@drawable/radio_button_selector"
+                android:textSize="20sp"
+                android:scaleX="1"
+                android:scaleY="1"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:gravity="center|left"
+                android:textSize="20sp"
+                android:text="衣物"/>
+
+            <RadioButton
+                android:id="@+id/rb_bedding"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:buttonTint="@color/transparent00"
+                android:background="@drawable/radio_button_selector"
+                android:textSize="20sp"
+                android:scaleX="1"
+                android:scaleY="1"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:gravity="center|left"
+                android:textSize="20sp"
+                android:text="床具"/>
+
+        </RadioGroup>
+
+
+
+        <LinearLayout
+            android:id="@+id/ll_clothingType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/Pink_1"
+                android:text="分类"
+                android:textSize="20sp"/>
+
+            <Spinner
+                android:id="@+id/sp_clothing_type"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:spinnerMode="dropdown" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/ll_beddingType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/Pink_1"
+                android:text="分类"
+                android:textSize="20sp"/>
+
+            <Spinner
+                android:id="@+id/sp_bedding_type"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:spinnerMode="dropdown" />
+
+        </LinearLayout>
+
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/Pink_1"
+            android:text="厚度"
+            android:textSize="20sp"/>
+
+        <Spinner
+            android:id="@+id/sp_clothes_thickness"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:spinnerMode="dropdown"
+            android:visibility="visible"/>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/Pink_1"
+            android:text="季节"
+            android:textSize="20sp"/>
+
+        <Spinner
+            android:id="@+id/sp_clothes_season"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:spinnerMode="dropdown"
+            android:visibility="visible" />
+
+        <EditText
+            android:id="@+id/et_brief"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:hint="请输入简介"
+            android:inputType="text"
+            android:theme="@style/MyEditTextStyle"
+            />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/Pink_1"
+            android:text="简介"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/tv_show_blotter_brief"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:textSize="18sp"
+            android:textColor="@color/gray"
+            tools:text="这里是简介"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="5dp"
+            android:background="@color/Pink_1"/>
+
+    </LinearLayout>
+
+
+    <ListView
+        android:id="@+id/lv_list_show_blotter_items"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"/>
+
+
+
+</LinearLayout>

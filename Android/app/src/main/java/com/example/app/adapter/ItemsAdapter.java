@@ -121,7 +121,7 @@ public class ItemsAdapter extends BaseAdapter implements View.OnClickListener{
             }
             mDBHelper.openWriteLink();
             mDBHelper.reviseItemsInfo(itemsInfo);
-            mDBHelper.closeLink();
+//            mDBHelper.closeLink();
 
         });
 
@@ -137,7 +137,7 @@ public class ItemsAdapter extends BaseAdapter implements View.OnClickListener{
 
                 mDBHelper.openWriteLink();
                 mDBHelper.reviseItemsInfo(itemsInfo);
-                mDBHelper.closeLink();
+//                mDBHelper.closeLink();
             }
 
         });

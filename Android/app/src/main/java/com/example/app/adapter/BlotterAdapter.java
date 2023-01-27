@@ -3,6 +3,7 @@ package com.example.app.adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -100,10 +101,23 @@ public class BlotterAdapter extends BaseAdapter {
                 info.items_id = noteInfoList.get(i).items_id;
                 info.type = noteInfoList.get(i).type;
                 info.number = noteInfoList.get(i).number;
-                MyApplication.noteInfoList.add(info);
-            }
 
+                boolean exist = false;
+
+                for(int j = 0; j < MyApplication.noteInfoList.size(); i++) {
+
+                    if (MyApplication.noteInfoList.get(i).items_id == (info.items_id) &&
+                            MyApplication.noteInfoList.get(i).type == (info.type)) {
+                        exist = true;
+                        break;
+                    }
+                }
+                if (!exist) {
+                    MyApplication.noteInfoList.add(info);
+                }
+            }
         });
+
 
         return convertView;
     }

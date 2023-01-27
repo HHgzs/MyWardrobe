@@ -246,8 +246,12 @@ public class BlotterDBHelper extends SQLiteOpenHelper {
 
 
     public void deleteTableInfo(String name) {
-        String sql = "DROP TABLE IF EXISTS " + name;
-        mWriteDB.execSQL(sql);
+        try {
+            String sql = "DROP TABLE IF EXISTS " + name;
+            mWriteDB.execSQL(sql);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 

@@ -13,6 +13,7 @@ public class staticData {
     public final static int IN_STORE = 1;
     public final static int PAGE_CLOTHES = 0;
     public final static int PAGE_ITEMS = 1;
+    public final static int PAGE_NOTES = 3;
     public final static int TYPE_CLOTHES = 0;
     public final static int TYPE_ITEMS = 1;
     public final static int TYPE_CLOTHING = 0;

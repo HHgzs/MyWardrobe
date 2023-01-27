@@ -6,7 +6,7 @@
     android:layout_height="70dp"
     android:orientation="horizontal"
     android:foreground="?android:attr/selectableItemBackground"
-    android:background="@color/white">
+    android:background="@color/background">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -68,7 +68,7 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:gravity="center"
-                android:background="@drawable/button_pink_ripple"
+                android:background="@drawable/button_pink_ripple_square"
                 android:textColor="@color/white"
                 android:textSize="16dp"
                 android:text="添加" />

@@ -150,10 +150,3 @@ public class ActivityCropper extends AppCompatActivity implements View.OnClickLi
 
 }
 
-
-
-
-
-
-
-

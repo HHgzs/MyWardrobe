@@ -5,6 +5,7 @@ import static com.example.app.util.ToastUtil.show;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.app.adapter.BlotterAdapter;
 import com.example.app.adapter.BlotterShowClothesAdapter;
 import com.example.app.adapter.BlotterShowItemsAdapter;
 import com.example.app.adapter.ClothesAdapter;
@@ -47,6 +49,7 @@ public class ActivityAddBlotter extends AppCompatActivity implements View.OnClic
     private RadioGroup rg_blotter_show_type;
     private RadioButton rb_blotter_clothes;
     private RadioButton rb_blotter_items;
+    private RadioButton rb_blotter_notes;
     private TextView tv_blotter_show_time;
     private ListView lv_list_blotter_add_items;
     private Button btn_blotter_set_time;
@@ -60,8 +63,10 @@ public class ActivityAddBlotter extends AppCompatActivity implements View.OnClic
 
     private List<clothesInfo> clothesInfoList;
     private List<itemsInfo> itemsInfoList;
+    private List<blotterInfo> blotterInfoList;
     private BlotterShowClothesAdapter clothesAdapter;
     private BlotterShowItemsAdapter itemsAdapter;
+    private BlotterAdapter blotterAdapter;
 
     private int mYear;
     private int mMonth;
@@ -72,6 +77,7 @@ public class ActivityAddBlotter extends AppCompatActivity implements View.OnClic
     private String tableName = staticData.EMPTY;
 
     private int page;
+
 
 
     @Override
@@ -94,6 +100,7 @@ public class ActivityAddBlotter extends AppCompatActivity implements View.OnClic
         rg_blotter_show_type.setOnCheckedChangeListener(this);
         rb_blotter_clothes = findViewById(R.id.rb_blotter_clothes);
         rb_blotter_items = findViewById(R.id.rb_blotter_items);
+        rb_blotter_notes = findViewById(R.id.rb_blotter_notes);
 
         mBlotterDBHelper = BlotterDBHelper.getInstance(this);
         mBlotterDBHelper.openReadLink();
@@ -103,11 +110,15 @@ public class ActivityAddBlotter extends AppCompatActivity implements View.OnClic
         mItemsDBHelper.openReadLink();
         mItemsDBHelper.openWriteLink();
 
+
         clothesInfoList = mItemsDBHelper.queryAllClothesInfo();
         itemsInfoList = mItemsDBHelper.queryAllItemsInfo();
+        blotterInfoList = mBlotterDBHelper.queryAllBlottersInfo();
+
 
         clothesAdapter = new BlotterShowClothesAdapter(this, clothesInfoList);
         itemsAdapter = new BlotterShowItemsAdapter(this, itemsInfoList);
+        blotterAdapter = new BlotterAdapter(this, blotterInfoList);
 
         lv_list_blotter_add_items.setAdapter(clothesAdapter);
         lv_list_blotter_add_items.setOnItemClickListener(this);
@@ -129,12 +140,7 @@ public class ActivityAddBlotter extends AppCompatActivity implements View.OnClic
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
 
-
-    }
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -158,6 +164,7 @@ public class ActivityAddBlotter extends AppCompatActivity implements View.OnClic
                 mBlotterDBHelper.insertBlotterInfo(blotterInfo);
 
 
+                finish();
                 break;
 
             case R.id.btn_exit:
@@ -177,11 +184,6 @@ public class ActivityAddBlotter extends AppCompatActivity implements View.OnClic
 
 
         }
-
-
-
-
-
 
     }
 
@@ -205,6 +207,12 @@ public class ActivityAddBlotter extends AppCompatActivity implements View.OnClic
                 lv_list_blotter_add_items.setAdapter(itemsAdapter);
                 lv_list_blotter_add_items.setOnItemClickListener(this);
                 break;
+
+            case R.id.rb_blotter_notes:
+                page = staticData.PAGE_NOTES;
+                lv_list_blotter_add_items.setAdapter(blotterAdapter);
+                lv_list_blotter_add_items.setOnItemClickListener(this);
+
         }
 
 
@@ -216,15 +224,41 @@ public class ActivityAddBlotter extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (page == staticData.PAGE_CLOTHES) {
-//            clothesInfoList.get(position).id;
 
+        Intent intent_items = new Intent(this,ActivityReviseItems.class);
+        Bundle bundle_items = new Bundle();
 
-        } else if (page == staticData.PAGE_ITEMS) {
-//            itemsInfoList.get(position).id
+        switch (page) {
 
+            case staticData.PAGE_CLOTHES:
+                bundle_items.putInt("id",clothesInfoList.get(position).id);
+                bundle_items.putInt("mItems",staticData.TYPE_CLOTHES);
+
+                intent_items.putExtras(bundle_items);
+                startActivity(intent_items);
+
+                break;
+
+            case staticData.PAGE_ITEMS:
+                bundle_items.putInt("id",itemsInfoList.get(position).id);
+                bundle_items.putInt("mItems",staticData.TYPE_ITEMS);
+
+                intent_items.putExtras(bundle_items);
+                startActivity(intent_items);
+
+                break;
+
+            case staticData.PAGE_NOTES:
+
+                Intent intent = new Intent(this, ActivityShowBlotter.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("tableName",blotterInfoList.get(position).table_name);
+                bundle.putInt("blotterID",blotterInfoList.get(position).id);
+                intent.putExtras(bundle);
+                startActivity(intent);
+
+                break;
         }
-
 
     }
 

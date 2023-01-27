@@ -23,6 +23,13 @@
         android:theme="@style/Theme.App"
         tools:targetApi="31">
         <activity
+            android:name=".ActivityShowBlotter"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".ActivityAddBlotter"
             android:exported="false">
             <meta-data

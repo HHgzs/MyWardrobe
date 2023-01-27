@@ -118,7 +118,7 @@ public class ClothesAdapter extends BaseAdapter {
             }
             mDBHelper.openWriteLink();
             mDBHelper.reviseClothesInfo(clothesInfo);
-            mDBHelper.closeLink();
+//            mDBHelper.closeLink();
 
         });
 
