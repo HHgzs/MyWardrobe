@@ -140,7 +140,7 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
         // 初始化下拉列表
         initSpinner();
         // 初始化数据
-//        setData();
+        setData();
 
     }
 
@@ -468,7 +468,7 @@ public class ActivityReviseItems extends AppCompatActivity implements View.OnCli
 
             sp_clothes_thickness.setSelection(mClothesInfo.thickness);
             sp_clothes_season.setSelection(mClothesInfo.season);
-            et_brief.setText(mClothesInfo.brief);
+
 
         } else if (mItems == staticData.TYPE_ITEMS) {
 

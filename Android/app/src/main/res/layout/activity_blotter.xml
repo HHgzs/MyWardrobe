@@ -14,16 +14,12 @@
         android:scaleType="centerCrop"
         android:src="@drawable/blotter_head_background" />
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp"
-        >
+
 
         <LinearLayout
             android:id="@+id/home_item"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
             >
 
@@ -36,24 +32,48 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="60dp"
                 android:background="@color/background"
-                android:orientation="vertical"
-                >
+                android:orientation="vertical">
 
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="115dp"
-                    android:background="@drawable/blotter_new_ripple" />
 
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="50dp"
+                    android:orientation="vertical">
+
+                    <ListView
+                        android:id="@+id/lv_blotter_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+
+
+
+
+
+
+
+                </LinearLayout>
 
             </LinearLayout>
 
         </LinearLayout>
 
-    </ScrollView>
+    <ImageView
+        android:id="@+id/iv_blotter_add"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:scaleType="fitCenter"
+        android:layout_marginTop="90dp"
+        android:src="@drawable/blotter_new_ripple" />
+
 
     <include layout="@layout/bottom_button" ></include>
+
 
 
 

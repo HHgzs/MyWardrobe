@@ -1,9 +1,6 @@
 package com.example.app;
 
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,13 +16,14 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.app.adapter.ClothesAdapter;
 import com.example.app.adapter.ItemsAdapter;
 import com.example.app.database.ItemsDBHelper;
 import com.example.app.entity.clothesInfo;
 import com.example.app.entity.itemsInfo;
 import com.example.app.entity.staticData;
-import com.example.app.util.ToastUtil;
 import com.example.app.util.pixUtil;
 
 import java.util.List;

@@ -169,7 +169,7 @@ public class FileUtil {
 
 
 
-    private static String getTime() {
+    public static String getTime() {
 
         String str;
         Calendar selectedDate = Calendar.getInstance();
